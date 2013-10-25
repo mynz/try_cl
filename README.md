@@ -1,4 +1,6 @@
 try_cl
 ======
 
-my tutrial
+This is my tutrial for OpenCL
+
+
