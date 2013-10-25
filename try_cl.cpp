@@ -18,7 +18,7 @@ int main()
 
 
 #if 1
-   //get all platforms (drivers)
+	// get all platforms (drivers)
     std::vector<cl::Platform> all_platforms;
     cl::Platform::get(&all_platforms);
     if(all_platforms.size()==0){
