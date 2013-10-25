@@ -5,3 +5,4 @@ solution "MySolution"
 		kind "ConsoleApp"
 		language "C++"
 		files { "**.cpp" }
+		linkoptions { "-framework OpenCL" }
