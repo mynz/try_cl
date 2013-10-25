@@ -1,8 +1,15 @@
 #define __CL_ENABLE_EXCEPTIONS
 
+#if defined(__APPLE__) || defined(__MACOSX)
+// #include <OpenCL.h>
+// #include <OpenCL/cl.hpp>
+#else
+// #include <CL/OpenCL.h>
+// #include "cl.hpp"
+#endif
+
 #include "cl.hpp"
 
-#include <CL/OpenCL.h>
 #include <iostream>
 
 using namespace std;
