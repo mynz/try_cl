@@ -30,7 +30,7 @@ void printPlatformInfo(const cl::Platform &p)
 	// printf("num platforms: %d\n", platforms.size());
 	for ( size_t i = 0; i < n; ++i ) {
 		p.getInfo(infos[i], &str);
-		printf("info[%u]: %s\n", i, str.c_str());
+		printf("info[%lu]: %s\n", i, str.c_str());
 	}
 }
 
@@ -54,7 +54,7 @@ int main(void)
 		std::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 
 #if 1
-		printf("num platforms: %d\n", platforms.size());
+		printf("num platforms: %lu\n", platforms.size());
 		for ( size_t i = 0; i < platforms.size(); ++i ) {
 			printPlatformInfo(platforms[i]);
 		}
