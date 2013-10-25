@@ -55,7 +55,9 @@ int main(void)
 
 #if 1
 		printf("num platforms: %d\n", platforms.size());
-		printPlatformInfo(platforms[0]);
+		for ( size_t i = 0; i < platforms.size(); ++i ) {
+			printPlatformInfo(platforms[i]);
+		}
 #endif
 
 		cl::Program::Sources source(1,
