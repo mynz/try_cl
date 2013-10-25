@@ -14,6 +14,26 @@ const char * helloStr  = "__kernel void "
                          "  "
                          "} ";
 
+						
+void printPlatformInfo(const cl::Platform &p)
+{
+	cl_platform_info infos[] = {
+		CL_PLATFORM_PROFILE,
+		CL_PLATFORM_VERSION,
+		CL_PLATFORM_NAME,
+		CL_PLATFORM_VENDOR,
+		CL_PLATFORM_EXTENSIONS,
+	};
+
+	std::string str;
+	size_t n = sizeof(infos) / sizeof(infos[0]);
+	// printf("num platforms: %d\n", platforms.size());
+	for ( size_t i = 0; i < n; ++i ) {
+		p.getInfo(infos[i], &str);
+		printf("info[%u]: %s\n", i, str.c_str());
+	}
+}
+
 int main(void)
 {
 	cl_int err = CL_SUCCESS;
@@ -32,6 +52,11 @@ int main(void)
 		cl::Context context(CL_DEVICE_TYPE_DEFAULT, properties); 
 
 		std::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+
+#if 1
+		printf("num platforms: %d\n", platforms.size());
+		printPlatformInfo(platforms[0]);
+#endif
 
 		cl::Program::Sources source(1,
 				std::make_pair(helloStr, strlen(helloStr)));
