@@ -3,3 +3,7 @@
 Debug/
 ipch/
 try_cl.xcodeproj/
+Makefile
+tags
+try_cl
+try_cl.make
