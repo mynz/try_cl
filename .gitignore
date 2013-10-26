@@ -2,3 +2,4 @@
 *.sdf
 Debug/
 ipch/
+try_cl.xcodeproj/
