@@ -40,6 +40,42 @@ void printPlatformInfo(const cl::Platform &p)
 	}
 }
 
+
+void printDeviceInfo(const cl::Device &dev)
+{
+	cl_platform_info infos[] = {
+		CL_DEVICE_NAME,
+		CL_DEVICE_VENDOR,
+		CL_DRIVER_VERSION,
+		CL_DEVICE_PROFILE,
+		CL_DEVICE_VERSION,
+		CL_DEVICE_EXTENSIONS,
+	};
+
+	std::string str;
+	size_t n = sizeof(infos) / sizeof(infos[0]);
+	// printf("num platforms: %d\n", platforms.size());
+	for ( size_t i = 0; i < n; ++i ) {
+		dev.getInfo(infos[i], &str);
+		printf("dev info[%lu]: %s\n", i, str.c_str());
+	}
+
+	puts("--");
+
+	printf("  CL_DEVICE_MAX_COMPUTE_UNITS: %u\n", dev.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>());
+	printf("  CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS: %u\n", dev.getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>());
+	printf("  CL_DEVICE_MAX_WORK_GROUP_SIZE: %lu\n", dev.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>());
+
+	std::vector<size_t> itemsSizes = dev.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>();
+	printf("CL_DEVICE_MAX_WORK_ITEM_SIZES[%lu]: %lu, %lu, %lu\n",
+		   	itemsSizes.size(),
+		   	itemsSizes[0],
+		   	itemsSizes[1],
+		   	itemsSizes[2]);
+
+	puts("--");
+}
+
 int main(void)
 {
 	cl_int err = CL_SUCCESS;
@@ -63,6 +99,11 @@ int main(void)
 		printf("num platforms: %lu\n", platforms.size());
 		for ( size_t i = 0; i < platforms.size(); ++i ) {
 			printPlatformInfo(platforms[i]);
+		}
+
+		printf("num devices: %lu\n", devices.size());
+		for ( size_t i = 0; i < devices.size(); ++i ) {
+			printDeviceInfo(devices[i]);
 		}
 #endif
 
