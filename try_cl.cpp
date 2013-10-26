@@ -12,6 +12,7 @@
 #endif
 
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -89,9 +90,11 @@ int main(void)
 		}
 
 		cl_context_properties properties[] = 
-		{ CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[0])(), 0};
+			{ CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[0])(), 0};
 
-		cl::Context context(CL_DEVICE_TYPE_DEFAULT, properties); 
+		cl_device_type dt = 1 ? CL_DEVICE_TYPE_DEFAULT : CL_DEVICE_TYPE_CPU;
+
+		cl::Context context(dt, properties); 
 
 		std::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 
@@ -107,8 +110,25 @@ int main(void)
 		}
 #endif
 
-		cl::Program::Sources source(1,
-				std::make_pair(helloStr, strlen(helloStr)));
+		// {
+			// std::ifstream fin("hello.cl");
+
+			FILE *fp = fopen("hello.cl", "rb");
+			fseek(fp, 0L, SEEK_END);
+			size_t n = ftell(fp);
+			fseek(fp, 0L, SEEK_SET);
+			char *text = (char*)malloc(n);
+			fread(text, 1, n, fp);
+			fclose(fp);
+
+			printf("text size : %lu\n", n);
+
+			cl::Program::Sources source(1,
+					// std::make_pair(helloStr, strlen(helloStr)));
+					std::make_pair(text, n));
+
+			free(text);
+
 		cl::Program program_ = cl::Program(context, source);
 		program_.build(devices);
 
