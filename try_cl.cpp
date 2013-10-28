@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -119,22 +120,18 @@ int main(void)
 		cl::Program::Sources source(1,
 				std::make_pair(helloStr, strlen(helloStr)));
 #else
-			FILE *fp = fopen("hello.cl", "rb");
-			fseek(fp, 0L, SEEK_END);
-			size_t n = ftell(fp);
-			fseek(fp, 0L, SEEK_SET);
-			char *text = (char*)malloc(n + 1);
-			fread(text, 1, n, fp);
-			text[n] = '\0';
-			fclose(fp);
+		string str;
+		{
+			std::stringstream ss;
+			ifstream fin("hello.cl");
+			ss << fin.rdbuf();
+			str = ss.str();
+		}
 
-			printf("text size : %lu\n", n);
-			puts(text);
+		cout << "code byte: " <<  str.size() << endl << str << endl;
 
-			cl::Program::Sources source(1,
-					std::make_pair(text, n));
-
-			// free(text);
+		cl::Program::Sources source(1,
+				std::make_pair(str.c_str(), str.size()));
 #endif
 
 		cl::Program program_ = cl::Program(context, source);
