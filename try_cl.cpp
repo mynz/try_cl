@@ -1,5 +1,10 @@
 #define __CL_ENABLE_EXCEPTIONS
 
+#if defined(WIN32)
+#pragma warning(disable:4996)
+#endif
+
+
 #if defined(__APPLE__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -110,24 +115,27 @@ int main(void)
 		}
 #endif
 
-		// {
-			// std::ifstream fin("hello.cl");
-
+#if 0
+		cl::Program::Sources source(1,
+				std::make_pair(helloStr, strlen(helloStr)));
+#else
 			FILE *fp = fopen("hello.cl", "rb");
 			fseek(fp, 0L, SEEK_END);
 			size_t n = ftell(fp);
 			fseek(fp, 0L, SEEK_SET);
-			char *text = (char*)malloc(n);
+			char *text = (char*)malloc(n + 1);
 			fread(text, 1, n, fp);
+			text[n] = '\0';
 			fclose(fp);
 
 			printf("text size : %lu\n", n);
+			puts(text);
 
 			cl::Program::Sources source(1,
-					// std::make_pair(helloStr, strlen(helloStr)));
 					std::make_pair(text, n));
 
-			free(text);
+			// free(text);
+#endif
 
 		cl::Program program_ = cl::Program(context, source);
 		program_.build(devices);
