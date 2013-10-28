@@ -82,6 +82,9 @@
   <ItemGroup>
     <ClCompile Include="try_cl.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="hello.cl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
