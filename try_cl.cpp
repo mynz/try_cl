@@ -166,10 +166,32 @@ int main(void)
 		err = kernel.setArg(1, matObj);
 		// err = kernel.setArg(1, sizeof(mat), mat);
 		assert( err == CL_SUCCESS );
-
 #endif
 
-#if 1
+
+#if 0 // image.
+		float imgSrc[3*3] = {
+			0, 1, 0,
+			1, 0, 0,
+			0, 1, 0,
+		};
+
+		cl::Image2D imgObj(context, CL_MEM_WRITE_ONLY,
+				cl::ImageFormat(CL_R, CL_FLOAT),
+				3, 3, 0, imgSrc, &err);
+
+		cl::size_t<3> origin; origin[0] = origin[1] = origin[2] = 0;
+		cl::size_t<3> region; region[0] = 3; region[1] = 3; region[2] = 1;
+
+		err = queue.enqueueWriteImage(imgObj, CL_TRUE, origin, region, 
+				0, 0, (void*)imgSrc);
+		assert( err == CL_SUCCESS );
+
+		kernel.setArg(2, imgObj);
+#endif
+
+
+#if 0
 		queue.enqueueTask(kernel, NULL, &event);
 #else
 		queue.enqueueNDRangeKernel(
