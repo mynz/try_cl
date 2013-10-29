@@ -148,13 +148,14 @@ int main(void)
 
 		cl_mem memObj = clCreateBuffer(context(), CL_MEM_READ_WRITE, 
 				sizeof(message), NULL, &err);
+		assert( err == CL_SUCCESS );
 
 		float mat[16];
 		for ( int i = 0; i < 16; ++i ) {
 			mat[i] = float(i);
 		}
 
-		cl::Buffer matObj(context, CL_MEM_READ_WRITE, sizeof(mat), (void*)mat, &err);
+		cl::Buffer matObj(context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, sizeof(mat), (void*)mat, &err);
 		assert( err == CL_SUCCESS );
 
 		err = queue.enqueueWriteBuffer( matObj, CL_TRUE, 0, sizeof(mat), (void*)mat);
