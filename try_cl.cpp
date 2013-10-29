@@ -155,7 +155,7 @@ int main(void)
 			mat[i] = float(i);
 		}
 
-		cl::Buffer matObj(context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, sizeof(mat), (void*)mat, &err);
+		cl::Buffer matObj(context, CL_MEM_READ_WRITE , sizeof(mat), NULL, &err);
 		assert( err == CL_SUCCESS );
 
 		err = queue.enqueueWriteBuffer( matObj, CL_TRUE, 0, sizeof(mat), (void*)mat);
