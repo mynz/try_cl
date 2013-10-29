@@ -18,13 +18,13 @@ __kernel void hello(__global char *str, __global float *mat)
 	str[15] = ((float4)(1, 1, 1, 1) == (float4)(1, 1, 1, 1)).x;
 
 	for ( int i = 0; i < 16; ++i ) {
-		mat[i] = i * 100.0f;
-		/* mat[i] *= 2.f; */
+		/* mat[i] = i * 100.0f; */
+		mat[i] *= 3.f;
 		/* mat[i] = mat[i] * 2.f; */
 	}
 
-	/* mat[0] = get_global_id(0); */
-	mat[0] = (1.0f == 1.0f);
-	mat[15] = ((float4)(1, 1, 1, 1) == (float4)(1, 1, 1, 1)).x;
+	mat[0] = get_global_id(0);
+	/* mat[0] = (1.0f == 1.0f); */
+	/* mat[15] = ((float4)(1, 1, 1, 1) == (float4)(1, 1, 1, 1)).x; */
 	/* mat[15] = as_float(((float4)(1, 1, 1, 1) == (float4)(1, 1, 1, 1)).x); */
 }

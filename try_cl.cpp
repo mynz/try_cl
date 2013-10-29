@@ -140,6 +140,8 @@ int main(void)
 
 		cl::Kernel kernel(program_, "hello", &err);
 
+		cl::Event event;
+		cl::CommandQueue queue(context, devices[0], 0, &err);
 
 #if 1 // XXX: hello_message
 		char message[32];
@@ -155,7 +157,9 @@ int main(void)
 		cl::Buffer matObj(context, CL_MEM_READ_WRITE, sizeof(mat), (void*)mat, &err);
 		assert( err == CL_SUCCESS );
 
-		cout << "err: " << err << endl;
+		err = queue.enqueueWriteBuffer( matObj, CL_TRUE, 0, sizeof(mat), (void*)mat);
+		assert( err == CL_SUCCESS );
+
 		err = clSetKernelArg(kernel(), 0, sizeof(cl_mem), &memObj);
 		assert( err == CL_SUCCESS );
 
@@ -166,15 +170,18 @@ int main(void)
 #endif
 
 
-		cl::Event event;
-		cl::CommandQueue queue(context, devices[0], 0, &err);
+		
+#if 1
+		queue.enqueueTask(kernel, NULL, &event);
+#else
 		queue.enqueueNDRangeKernel(
 				kernel, 
-				cl::NullRange, 
-				cl::NDRange(4,4),
+				cl::NullRange,  // must be null in current OpenCL verison.
+				cl::NDRange(1),
 				cl::NullRange,
 				NULL,
 				&event); 
+#endif
 
 		event.wait();
 
@@ -188,7 +195,18 @@ int main(void)
 
 		printf("message[15]: '%d'\n", message[15]);
 
-		queue.enqueueReadBuffer(matObj, true, 0, sizeof(mat), mat);
+
+		for ( int i = 0; i < 16; ++i ) {
+			cout << "mat[" << i << "]: " << mat[i] << endl;
+		}
+
+		err = clEnqueueReadBuffer(queue(), matObj(), CL_TRUE, 0,
+				sizeof(mat), &mat[0], 0, NULL, NULL);
+		// err = queue.enqueueReadBuffer(matObj, CL_TRUE, 0, sizeof(mat), mat, NULL, &event);
+		assert( err == CL_SUCCESS );
+
+		// Sleep(3000);
+
 		for ( int i = 0; i < 16; ++i ) {
 			cout << "mat[" << i << "]: " << mat[i] << endl;
 		}
