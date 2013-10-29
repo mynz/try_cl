@@ -139,6 +139,18 @@ int main(void)
 
 		cl::Kernel kernel(program_, "hello", &err);
 
+
+#if 1 // XXX: hello_message
+		char message[32];
+
+		cl_mem memObj = clCreateBuffer(context(), CL_MEM_READ_WRITE, 
+				sizeof(message), NULL, &err);
+
+		cout << "err: " << err << endl;
+		clSetKernelArg(kernel(), 0, sizeof(cl_mem), &memObj);
+#endif
+
+
 		cl::Event event;
 		cl::CommandQueue queue(context, devices[0], 0, &err);
 		queue.enqueueNDRangeKernel(
@@ -150,6 +162,18 @@ int main(void)
 				&event); 
 
 		event.wait();
+
+
+#if 1 // XXX: hello_message
+		err = clEnqueueReadBuffer(queue(), memObj, CL_TRUE, 0,
+				sizeof(message), message, 0, NULL, NULL);
+
+		cout << "read err: " << err << endl;
+		cout << "read: " << message << endl;
+#endif
+
+
+
 	}
 	catch (cl::Error err) {
 		std::cerr 
