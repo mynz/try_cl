@@ -153,6 +153,10 @@ int main(void)
 
 		cl::Event event;
 		cl::CommandQueue queue(context, devices[0], 0, &err);
+
+#if 1
+		queue.enqueueTask(kernel, 0, &event);
+#else
 		queue.enqueueNDRangeKernel(
 				kernel, 
 				cl::NullRange, 
@@ -160,16 +164,19 @@ int main(void)
 				cl::NullRange,
 				NULL,
 				&event); 
+#endif
 
 		event.wait();
 
 
 #if 1 // XXX: hello_message
 		err = clEnqueueReadBuffer(queue(), memObj, CL_TRUE, 0,
-				sizeof(message), message, 0, NULL, NULL);
+				sizeof(message), message, 0, NULL, &event());
+
+		event.wait();
 
 		cout << "read err: " << err << endl;
-		cout << "read: " << message << endl;
+		cout << "RESULT MESSAGE IS [" << message << "]" << endl;
 #endif
 
 

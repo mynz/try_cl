@@ -13,4 +13,10 @@ __kernel void hello(__global char *str)
 	str[2] = 'l';
 	str[3] = 'l';
 	str[4] = 'o';
+
+	char w[] = "World";
+	int n = sizeof(w);
+	for ( int i = 0; i < n; ++i ) {
+		str[i + 5] = w[i];
+	}
 }
