@@ -19,6 +19,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <assert.h>
 
 using namespace std;
 
@@ -139,6 +140,8 @@ int main(void)
 
 		cl::Kernel kernel(program_, "hello", &err);
 
+		cl::Event event;
+		cl::CommandQueue queue(context, devices[0], 0, &err);
 
 #if 1 // XXX: hello_message
 		char message[32];
@@ -146,21 +149,33 @@ int main(void)
 		cl_mem memObj = clCreateBuffer(context(), CL_MEM_READ_WRITE, 
 				sizeof(message), NULL, &err);
 
-		cout << "err: " << err << endl;
-		clSetKernelArg(kernel(), 0, sizeof(cl_mem), &memObj);
+		float mat[16];
+		for ( int i = 0; i < 16; ++i ) {
+			mat[i] = float(i);
+		}
+
+		cl::Buffer matObj(context, CL_MEM_READ_WRITE, sizeof(mat), (void*)mat, &err);
+		assert( err == CL_SUCCESS );
+
+		err = queue.enqueueWriteBuffer( matObj, CL_TRUE, 0, sizeof(mat), (void*)mat);
+		assert( err == CL_SUCCESS );
+
+		err = clSetKernelArg(kernel(), 0, sizeof(cl_mem), &memObj);
+		assert( err == CL_SUCCESS );
+
+		err = kernel.setArg(1, matObj);
+		// err = kernel.setArg(1, sizeof(mat), mat);
+		assert( err == CL_SUCCESS );
+
 #endif
 
-
-		cl::Event event;
-		cl::CommandQueue queue(context, devices[0], 0, &err);
-
 #if 1
-		queue.enqueueTask(kernel, 0, &event);
+		queue.enqueueTask(kernel, NULL, &event);
 #else
 		queue.enqueueNDRangeKernel(
 				kernel, 
-				cl::NullRange, 
-				cl::NDRange(4,4),
+				cl::NullRange,  // must be null in current OpenCL verison.
+				cl::NDRange(1),
 				cl::NullRange,
 				NULL,
 				&event); 
@@ -177,6 +192,25 @@ int main(void)
 
 		cout << "read err: " << err << endl;
 		cout << "RESULT MESSAGE IS [" << message << "]" << endl;
+		cout << "read: " << message << endl;
+
+		printf("message[15]: '%d'\n", message[15]);
+
+
+		for ( int i = 0; i < 16; ++i ) {
+			cout << "mat[" << i << "]: " << mat[i] << endl;
+		}
+
+		err = clEnqueueReadBuffer(queue(), matObj(), CL_TRUE, 0,
+				sizeof(mat), &mat[0], 0, NULL, NULL);
+		// err = queue.enqueueReadBuffer(matObj, CL_TRUE, 0, sizeof(mat), mat, NULL, &event);
+		assert( err == CL_SUCCESS );
+
+		// Sleep(3000);
+
+		for ( int i = 0; i < 16; ++i ) {
+			cout << "mat[" << i << "]: " << mat[i] << endl;
+		}
 #endif
 
 
