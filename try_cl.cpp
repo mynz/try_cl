@@ -19,6 +19,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <assert.h>
 
 using namespace std;
 
@@ -146,8 +147,22 @@ int main(void)
 		cl_mem memObj = clCreateBuffer(context(), CL_MEM_READ_WRITE, 
 				sizeof(message), NULL, &err);
 
+		float mat[16];
+		for ( int i = 0; i < 16; ++i ) {
+			mat[i] = float(i);
+		}
+
+		cl::Buffer matObj(context, CL_MEM_READ_WRITE, sizeof(mat), (void*)mat, &err);
+		assert( err == CL_SUCCESS );
+
 		cout << "err: " << err << endl;
-		clSetKernelArg(kernel(), 0, sizeof(cl_mem), &memObj);
+		err = clSetKernelArg(kernel(), 0, sizeof(cl_mem), &memObj);
+		assert( err == CL_SUCCESS );
+
+		err = kernel.setArg(1, matObj);
+		// err = kernel.setArg(1, sizeof(mat), mat);
+		assert( err == CL_SUCCESS );
+
 #endif
 
 
@@ -170,6 +185,13 @@ int main(void)
 
 		cout << "read err: " << err << endl;
 		cout << "read: " << message << endl;
+
+		printf("message[15]: '%d'\n", message[15]);
+
+		queue.enqueueReadBuffer(matObj, true, 0, sizeof(mat), mat);
+		for ( int i = 0; i < 16; ++i ) {
+			cout << "mat[" << i << "]: " << mat[i] << endl;
+		}
 #endif
 
 
