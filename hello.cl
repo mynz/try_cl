@@ -5,8 +5,8 @@ const sampler_t s_linear  = CLK_FILTER_LINEAR  | CLK_NORMALIZED_COORDS_FALSE | C
 
 /* __kernel void hello(void)  */
 __kernel void hello(
-		__global char *str,
-		__global float *mat
+		  __global char *str
+		, __global float *mat
 		/* , __global image2d_t image */
 		) 
 {
