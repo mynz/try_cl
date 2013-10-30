@@ -154,30 +154,22 @@ bool saveImage(const char *filename, int w, int h, uint8_t *image)
 
 int main(void)
 {
+	const int w = 512, h = 512;
+	size_t outImageByte = w * h * 4;
+#if 0
+	uint8_t *outImage = (uint8_t*)malloc(outImageByte);
+	memset(outImage, 0xcc, outImageByte);
 
-#if 1
-	{
-		int w = 512, h = 512;
-		size_t byte = w * h * 4;
-		uint8_t *outImage = (uint8_t*)malloc(byte);
-		// memset(outImage, 0xcc, byte);
+	/*
+	 * uint8_t *p = outImage;
+	 * for ( int i = 0; i < w * h; ++i ) {
+	 *     *p++ = 0xff; *p++ = 0x88; *p++ = 0x22; *p++ = 0x00;
+	 * }
+	 */
 
-		uint8_t *p = outImage;
-		for ( int i = 0; i < w * h; ++i ) {
-			*p++ = 0xff;
-			*p++ = 0x88;
-			*p++ = 0x22;
-			*p++ = 0x00;
-		}
-
-
-		saveImage("out.bmp", w, h, outImage);
-
-		free(outImage);
-	}
-
+	// saveImage("out.bmp", w, h, outImage);
+	// free(outImage);
 #endif
-
 
 	cl_int err = CL_SUCCESS;
 	try {
@@ -222,7 +214,8 @@ int main(void)
 			str = ss.str();
 		}
 
-		cout << "code byte: " <<  str.size() << endl << str << endl;
+		cout << "code byte: " <<  str.size() << endl;
+		// cout << "code byte: " <<  str.size() << endl << str << endl;
 
 		cl::Program::Sources source(1,
 				std::make_pair(str.c_str(), str.size()));
@@ -263,7 +256,7 @@ int main(void)
 #endif
 
 
-#if 1 // image.
+#if 1 // input image.
 		float imgSrc[3*3] = {
 			0, 1, 0,
 			1, 0, 0,
@@ -282,6 +275,17 @@ int main(void)
 		assert( err == CL_SUCCESS );
 
 		kernel.setArg(2, imgObj);
+#endif
+
+
+#if 1 // outImage
+		cl::Buffer outImageMem(context, CL_MEM_WRITE_ONLY, outImageByte, NULL, &err); 
+		assert( err == CL_SUCCESS );
+
+		// err = queue.enqueueWriteBuffer( outImageMem, CL_TRUE, 0, sizeof(outImageMem), (void*)outImage);
+		
+		err = kernel.setArg(3, outImageMem);
+		assert( err == CL_SUCCESS );
 #endif
 
 
@@ -327,6 +331,17 @@ int main(void)
 		for ( int i = 0; i < 16; ++i ) {
 			cout << "dst mat[" << i << "]: " << mat[i] << endl;
 		}
+#endif
+
+#if 1
+		uint8_t *outImage = (uint8_t*)malloc(outImageByte);
+		memset(outImage, 0xcc, outImageByte);
+		err = queue.enqueueReadBuffer(outImageMem, CL_TRUE, 0,
+				outImageByte, outImage, NULL, NULL);
+		assert( err == CL_SUCCESS );
+
+		saveImage("out.bmp", w, h, outImage);
+		free(outImage);
 #endif
 
 

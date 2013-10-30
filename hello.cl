@@ -7,6 +7,8 @@ __kernel void hello(
 		  __global char *str
 		, __global float *mat
 		, __read_only image2d_t image
+		, __global uchar4 *outImage
+		/* , __global float *outImage */
 		) 
 {
 	str[0] = 'H';
@@ -46,6 +48,13 @@ __kernel void hello(
 			int i = 4 * y + x;
 			mat[i] = col.x;
 		}
+	}
+#endif
+
+#if 1
+	uchar4 col = (uchar4)(0, 10, 100, 0);
+	for ( int i = 0; i < 3 * 256 * 256; ++i ) {
+		outImage[i] = col;
 	}
 #endif
 
