@@ -51,10 +51,32 @@ __kernel void hello(
 	}
 #endif
 
-#if 1
+#if 0 // ok
 	uchar4 col = (uchar4)(0, 10, 100, 0);
 	for ( int i = 0; i < 3 * 256 * 256; ++i ) {
 		outImage[i] = col;
+	}
+#endif
+
+#if 1 // ray tracing.
+	const uchar4 red  = (uchar4)(255, 0, 0, 0);
+	const uchar4 blue = (uchar4)(0, 255, 0, 0);
+	const float  kRad = 0.4f;
+
+	const int kWidth = 512;
+	for ( int h = 0; h < kWidth; ++h ) {
+		for ( int w = 0; w < kWidth; ++w ) {
+
+			int idx = w * kWidth + h;
+			float x = (float)w / kWidth;
+			float y = (float)h / kWidth;
+			float len2 = x * x + y * y;
+
+			/* outImage[idx] = len2 < 0.3f ? red : blue; */
+
+			uchar4 col = len2 < (kRad * kRad) ? red : blue;
+			outImage[idx] = col;
+		}
 	}
 #endif
 
