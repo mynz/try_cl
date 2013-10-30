@@ -7,7 +7,7 @@ const sampler_t s_linear  = CLK_FILTER_LINEAR  | CLK_NORMALIZED_COORDS_FALSE | C
 __kernel void hello(
 		  __global char *str
 		, __global float *mat
-		/* , __global image2d_t image */
+		, __read_only image2d_t image
 		) 
 {
 	str[0] = 'H';
@@ -38,7 +38,7 @@ __kernel void hello(
 	/* mat[15] = as_float(((float4)(1, 1, 1, 1) == (float4)(1, 1, 1, 1)).x); */
 
 
-#if 0
+#if 1
 
 	float4 f4 = read_imagef(image, s_nearest, (float2)(0.0f, 0.5f));
 	/* float4 f4 = (float4)(0, 0, 0, 0); */

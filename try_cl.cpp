@@ -170,16 +170,16 @@ int main(void)
 #endif
 
 
-#if 0 // image.
+#if 1 // image.
 		float imgSrc[3*3] = {
 			0, 1, 0,
 			1, 0, 0,
 			0, 1, 0,
 		};
 
-		cl::Image2D imgObj(context, CL_MEM_WRITE_ONLY,
+		cl::Image2D imgObj(context, CL_MEM_READ_ONLY,
 				cl::ImageFormat(CL_R, CL_FLOAT),
-				3, 3, 0, imgSrc, &err);
+				3, 3, 0, NULL, &err);
 
 		cl::size_t<3> origin; origin[0] = origin[1] = origin[2] = 0;
 		cl::size_t<3> region; region[0] = 3; region[1] = 3; region[2] = 1;
