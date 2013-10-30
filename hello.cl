@@ -3,7 +3,6 @@
 const sampler_t s_nearest = CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 const sampler_t s_linear  = CLK_FILTER_LINEAR  | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 
-/* __kernel void hello(void)  */
 __kernel void hello(
 		  __global char *str
 		, __global float *mat
@@ -39,17 +38,17 @@ __kernel void hello(
 
 
 #if 1
-
-	float4 f4 = read_imagef(image, s_nearest, (float2)(0.0f, 0.5f));
-	/* float4 f4 = (float4)(0, 0, 0, 0); */
-	float f = f4.x;
-	mat[0] = f;
-	/* mat[0] = (float)(f4); */
-
-
-	/* mat[0] = read_imagef(image, s_nearest, (float2)(0.0f, 0.5f)); */
-	/* mat[1] = read_imagef(image, s_nearest, (float2)(0.5f, 0.5f)); */
-	/* mat[2] = read_imagef(image, s_nearest, (float2)(0.25f, 0.5f)); */
+	int x, y;
+	for ( y = 0; y < 4; ++y ) {
+		for ( x = 0; x < 4; ++x ) {
+			float2 pos = (float2)(x, y);
+			float4 col = read_imagef(image, s_linear, pos);
+			int i = 4 * y + x;
+			mat[i] = col.x;
+		}
+	}
 #endif
 
 }
+/* #define CL_BUILD_PROGRAM_FAILURE                    -11 */
+/* #define CL_INVALID_KERNEL_ARGS                      -52 */

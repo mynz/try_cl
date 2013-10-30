@@ -220,9 +220,9 @@ int main(void)
 		printf("message[15]: '%d'\n", message[15]);
 
 
-		for ( int i = 0; i < 16; ++i ) {
-			cout << "mat[" << i << "]: " << mat[i] << endl;
-		}
+		// for ( int i = 0; i < 16; ++i ) {
+			// cout << "src mat[" << i << "]: " << mat[i] << endl;
+		// }
 
 		err = clEnqueueReadBuffer(queue(), matObj(), CL_TRUE, 0,
 				sizeof(mat), &mat[0], 0, NULL, NULL);
@@ -232,7 +232,7 @@ int main(void)
 		// Sleep(3000);
 
 		for ( int i = 0; i < 16; ++i ) {
-			cout << "mat[" << i << "]: " << mat[i] << endl;
+			cout << "dst mat[" << i << "]: " << mat[i] << endl;
 		}
 #endif
 
