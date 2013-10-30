@@ -170,25 +170,39 @@ int main(void)
 #endif
 
 
-#if 0 // image.
-		float imgSrc[3*3] = {
+#if 1 // image.
+		const size_t width = 3, height = 3;
+		float imgSrc[width * height] = {
 			0, 1, 0,
 			1, 0, 0,
 			0, 1, 0,
 		};
 
-		cl::Image2D imgObj(context, CL_MEM_WRITE_ONLY,
-				cl::ImageFormat(CL_R, CL_FLOAT),
-				3, 3, 0, imgSrc, &err);
+        cl_image_format format;
+        format.image_channel_order = CL_R;
+        format.image_channel_data_type = CL_FLOAT;
 
-		cl::size_t<3> origin; origin[0] = origin[1] = origin[2] = 0;
-		cl::size_t<3> region; region[0] = 3; region[1] = 3; region[2] = 1;
-
-		err = queue.enqueueWriteImage(imgObj, CL_TRUE, origin, region, 
-				0, 0, (void*)imgSrc);
+		cl_mem imgMem = ::clCreateImage2D(
+				context(),
+				CL_MEM_READ_ONLY, &format,
+				width, height, 0, NULL, &err);
 		assert( err == CL_SUCCESS );
 
-		kernel.setArg(2, imgObj);
+		size_t origin[] = { 0, 0, 0 };
+		size_t region[] = { 3, 3, 1 };
+
+		err = ::clEnqueueWriteImage(queue(),
+				imgMem, CL_TRUE,
+				origin, region,
+				0, 0,
+				(void*)imgSrc,
+				0, NULL,
+				NULL);
+		assert( err == CL_SUCCESS );
+
+		err = clSetKernelArg(kernel(), 2, sizeof(imgMem), &imgMem);
+		assert( err == CL_SUCCESS );
+
 #endif
 
 
