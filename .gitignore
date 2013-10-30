@@ -7,3 +7,4 @@ Makefile
 tags
 try_cl
 try_cl.make
+*.bmp
