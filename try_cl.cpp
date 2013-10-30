@@ -16,6 +16,7 @@
 #pragma clang diagnostic pop
 #endif
 
+#include <stdint.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -84,8 +85,100 @@ void printDeviceInfo(const cl::Device &dev)
 	puts("--");
 }
 
+bool saveImage(const char *filename, int w, int h, uint8_t *image)
+{
+	if ( (w % 8) || (h % 8) ) {
+		printf("Error[saveImage]: width and height must be number of divided by 8");
+		return false;
+	}
+
+#pragma pack(push, 1)
+	struct BITMAPFILEHEADER {
+	  unsigned short bfType;
+	  unsigned long  bfSize;
+	  unsigned short bfReserved1;
+	  unsigned short bfReserved2;
+	  unsigned long  bfOffBits;
+	};
+
+	struct BITMAPINFOHEADER {
+		unsigned long  biSize;
+		long           biWidth;
+		long           biHeight;
+		unsigned short biPlanes;
+		unsigned short biBitCount;
+		unsigned long  biCompression;
+		unsigned long  biSizeImage;
+		long           biXPixPerMeter;
+		long           biYPixPerMeter;
+		unsigned long  biClrUsed;
+		unsigned long  biClrImporant;
+	};
+#pragma pack(pop)
+
+	const int kChannels = 4;
+
+	size_t imageSize = w * h * kChannels;
+	BITMAPFILEHEADER bheader = {
+		0x4d42, // 'MB',
+		imageSize + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER),
+		0, 0, // reserved
+		sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) // offset
+	};
+
+	BITMAPINFOHEADER binfo = {
+		40,
+		w, h,
+		1,			// biPlanes
+		kChannels == 4 ? 32 : 24,
+		0,			// biCompression
+		imageSize,	// biSizeImage
+		0, 0,
+		0, 0
+	};
+
+	bheader.bfSize = imageSize + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+
+	FILE *fp = fopen(filename, "wb");
+	if ( fp ) {
+		fwrite(&bheader, 1, sizeof(bheader), fp);
+		fwrite(&binfo, 1, sizeof(binfo), fp);
+		fwrite(image, 1, imageSize, fp);
+		fclose(fp);
+
+		printf("saveImage has done successfully.\n");
+		return true;
+	}
+	return false;
+}
+
 int main(void)
 {
+
+#if 1
+	{
+		int w = 512, h = 512;
+		size_t byte = w * h * 4;
+		uint8_t *outImage = (uint8_t*)malloc(byte);
+		// memset(outImage, 0xcc, byte);
+
+		uint8_t *p = outImage;
+		for ( int i = 0; i < w * h; ++i ) {
+			*p++ = 0xff;
+			*p++ = 0x88;
+			*p++ = 0x22;
+			*p++ = 0x00;
+		}
+
+
+		saveImage("out.bmp", w, h, outImage);
+
+		free(outImage);
+	}
+
+#endif
+
+
 	cl_int err = CL_SUCCESS;
 	try {
 
