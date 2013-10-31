@@ -93,7 +93,7 @@ bool saveImage(const char *filename, int w, int h, uint8_t *image)
 	}
 
 #pragma pack(push, 1)
-	struct __attribute__((packed)) BITMAPFILEHEADER {
+	struct /* __attribute__((packed)) */ BITMAPFILEHEADER {
 	  uint16_t	bfType;
 	  uint32_t	bfSize;
 	  uint16_t	bfReserved1;
@@ -101,7 +101,7 @@ bool saveImage(const char *filename, int w, int h, uint8_t *image)
 	  uint32_t	bfOffBits;
 	} ;
 
-	struct __attribute__((packed)) BITMAPINFOHEADER {
+	struct /* __attribute__((packed)) */ BITMAPINFOHEADER {
 		uint32_t	biSize;
 		int32_t		biWidth;
 		int32_t		biHeight;
