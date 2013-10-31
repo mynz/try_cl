@@ -131,15 +131,26 @@ __kernel void hello(
 			ray.orig = camera_pos;
 			ray.dir  = dir;
 
-			Sphere sphere;
-			sphere.center = (float3)(0, 0, -4.f);
-			sphere.radius = 1.0f;
+			Sphere sp;
+			sp.center = (float3)(0, 0, -4.f);
+			sp.radius = 1.0f;
 
-			float d = ray_sphere(sphere, ray);
+			float d = ray_sphere(sp, ray);
 			uchar4 col = (d == infinity) ? blue : red;
 
-			col = d * 256 * 4;
 
+			if ( d == infinity ) {
+				col = blue;
+			} else {
+				float3 nrm = normalize((camera_pos + d * dir) - sp.center);
+				col = (uchar4)(convert_uchar3(nrm * 255), 255); // XXX
+			}
+
+
+
+
+
+			/* col = d * 256 * 4; */
 			/* col = (uchar4)(convert_uchar3(dir.xyz * 255 + 128), 255); */
 
 
