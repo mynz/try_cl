@@ -303,13 +303,14 @@ int main(void)
 
 #if 1
 		struct Sphere {
-			float center[3];
+			float center[4];
 			float radius;
+			float pad[3]; // 
 		};
 
 		Sphere sphereArray[2] = {
-			{ { 0, 0, 0 }, 0.5f },
-			{ { 1, 1, 0 }, 0.3f },
+			{ { 0.0f, 0.0f, -3.f, 1.f}, 0.5f },
+			{ { 0.0f, 0.5f, -3.f, 1.f}, 0.3f },
 		};
 
 		// cl::Buffer sphereMem(context, CL_MEM_READ_ONLY, sizeof(sphereArray), NULL, &err);

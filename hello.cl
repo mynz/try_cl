@@ -45,7 +45,6 @@ __kernel void hello(
 		, __read_only image2d_t image
 		, __global uchar4 *outImage
 		/* , __global float *outImage */
-
 		, __global Sphere *sphere_array
 		) 
 {
@@ -135,9 +134,12 @@ __kernel void hello(
 			ray.dir  = dir;
 
 			Sphere sp;
-
+#if 1
+			sp = sphere_array[1];
+#else
 			sp.center = (float3)(0, 0, -3.0f);
 			sp.radius = 1.0f;
+#endif
 
 			float d = ray_sphere(sp, ray);
 			uchar4 col = (d == infinity) ? blue : red;
@@ -151,14 +153,11 @@ __kernel void hello(
 			}
 
 
-
-
-
 			/* col = d * 256 * 4; */
 			/* col = (uchar4)(convert_uchar3(dir.xyz * 255 + 128), 255); */
 
-
-			int idx = sx * kWidth + sy;
+			/* int idx = sx * kWidth + sy; */
+			int idx = sy * kWidth + sx;
 			outImage[idx] = col;
 		}
 	}
