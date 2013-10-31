@@ -4,12 +4,37 @@ const sampler_t s_nearest = CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE | C
 const sampler_t s_linear  = CLK_FILTER_LINEAR  | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 
 #define kWidth 512
+#define infinity (100000000.f)
 
 float2 to_world(int x, int y)
 {
 	return (float2) ((float)x / kWidth * 2.f - 1.0f,
 					((float)y / kWidth * 2.f - 1.0f));
 }
+
+typedef struct {
+	float3 orig, dir;
+} Ray;
+
+typedef struct {
+	float3 center;
+	float radius;
+} Sphere;
+
+float ray_sphere(Sphere sphere, Ray ray)
+{
+	float3 v = sphere.center - ray.orig;
+	float b = dot(v, ray.dir);
+	float disc = b*b - dot(v, v) + sphere.radius * sphere.radius;
+
+	if (disc < 0) return infinity;
+	float d = sqrt(disc);
+	float t2 = b + d;
+	if (t2 < 0) return infinity;
+	float t1 = b - d;
+	return (t1 > 0 ? t1 : t2);
+}
+
 
 /**
  *
