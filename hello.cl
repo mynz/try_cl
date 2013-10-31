@@ -3,6 +3,17 @@
 const sampler_t s_nearest = CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 const sampler_t s_linear  = CLK_FILTER_LINEAR  | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 
+#define kWidth 512
+
+float2 to_world(int x, int y)
+{
+	return (float2) ((float)x / kWidth * 2.f - 1.0f,
+					((float)y / kWidth * 2.f - 1.0f));
+}
+
+/**
+ *
+ */
 __kernel void hello(
 		  __global char *str
 		, __global float *mat
@@ -58,21 +69,18 @@ __kernel void hello(
 	}
 #endif
 
+
 #if 1 // ray tracing.
 	const uchar4 red  = (uchar4)(255, 0, 0, 0);
 	const uchar4 blue = (uchar4)(0, 255, 0, 0);
 	const float  kRad = 0.4f;
 
-	const int kWidth = 512;
-	for ( int h = 0; h < kWidth; ++h ) {
-		for ( int w = 0; w < kWidth; ++w ) {
+	for ( int sy = 0; sy < kWidth; ++sy ) {
+		for ( int sx = 0; sx < kWidth; ++sx ) {
 
-			int idx = w * kWidth + h;
-			float x = (float)w / kWidth;
-			float y = (float)h / kWidth;
-			float len2 = x * x + y * y;
-
-			/* outImage[idx] = len2 < 0.3f ? red : blue; */
+			int idx = sx * kWidth + sy;
+			float2 w = to_world(sx, sy);
+			float len2 = dot(w, w);
 
 			uchar4 col = len2 < (kRad * kRad) ? red : blue;
 			outImage[idx] = col;
