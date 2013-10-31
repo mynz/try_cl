@@ -115,8 +115,8 @@ __kernel void hello(
 #endif
 
 #if 1 // ray tracing.
-	const uchar4 red = (uchar4)(0, 0, 255, 255);
-	const uchar4 blue  = (uchar4)(255, 0, 0, 255);
+	const uchar4 red  = (uchar4)(0, 0, 255, 255);
+	const uchar4 blue = (uchar4)(255, 0, 0, 255);
 	const float  kRad = 0.4f;
 
 	float3 camera_pos = (float3)(0, 0, 0);
@@ -134,29 +134,16 @@ __kernel void hello(
 			ray.dir  = dir;
 
 			Sphere sp;
-#if 1
-			sp = sphere_array[1];
-#else
-			sp.center = (float3)(0, 0, -3.0f);
-			sp.radius = 1.0f;
-#endif
-
-			float d = ray_sphere(sp, ray);
-			uchar4 col = (d == infinity) ? blue : red;
-
-
-			if ( d == infinity ) {
-				col = blue;
-			} else {
-				float3 nrm = normalize((camera_pos + d * dir) - sp.center);
-				col = (uchar4)(convert_uchar3(nrm * 255), 255); // XXX
+			uchar4 col = blue;
+			for ( int s = 0; s < 2; ++s ) {
+				sp = sphere_array[s];
+				float d = ray_sphere(sp, ray);
+				if ( d != infinity ) {
+					float3 nrm = normalize((camera_pos + d * dir) - sp.center);
+					col = (uchar4)(convert_uchar3(nrm * 255), 255); // XXX
+				}
 			}
 
-
-			/* col = d * 256 * 4; */
-			/* col = (uchar4)(convert_uchar3(dir.xyz * 255 + 128), 255); */
-
-			/* int idx = sx * kWidth + sy; */
 			int idx = sy * kWidth + sx;
 			outImage[idx] = col;
 		}
