@@ -301,6 +301,29 @@ int main(void)
 		assert( err == CL_SUCCESS );
 #endif
 
+#if 1
+		struct Sphere {
+			float center[3];
+			float radius;
+		};
+
+		Sphere sphereArray[2] = {
+			{ { 0, 0, 0 }, 0.5f },
+			{ { 1, 1, 0 }, 0.3f },
+		};
+
+		// cl::Buffer sphereMem(context, CL_MEM_READ_ONLY, sizeof(sphereArray), NULL, &err);
+		cl::Buffer sphereMem(context, CL_MEM_READ_ONLY, sizeof(sphereArray), sphereArray, &err);
+		assert( err == CL_SUCCESS );
+
+		err = queue.enqueueWriteBuffer(sphereMem, CL_TRUE, 0, sizeof(sphereArray), sphereArray);
+		assert( err == CL_SUCCESS );
+
+		err = kernel.setArg(4, sphereMem);
+		assert( err == CL_SUCCESS );
+
+#endif
+
 
 #if 0
 		queue.enqueueTask(kernel, NULL, &event);

@@ -45,6 +45,8 @@ __kernel void hello(
 		, __read_only image2d_t image
 		, __global uchar4 *outImage
 		/* , __global float *outImage */
+
+		, __global Sphere *sphere_array
 		) 
 {
 	str[0] = 'H';
@@ -118,13 +120,14 @@ __kernel void hello(
 	const uchar4 blue  = (uchar4)(255, 0, 0, 255);
 	const float  kRad = 0.4f;
 
+	float3 camera_pos = (float3)(0, 0, 0);
+
 	for ( int sy = 0; sy < kWidth; ++sy ) {
 		for ( int sx = 0; sx < kWidth; ++sx ) {
 
 			float2 w = to_world(sx, sy);
 
 			float3 screen_center = (float3)(w, -1.f);
-			float3 camera_pos = (float3)(0, 0, 0);
 			float3 dir = normalize(screen_center - camera_pos);
 
 			Ray ray;
@@ -132,7 +135,8 @@ __kernel void hello(
 			ray.dir  = dir;
 
 			Sphere sp;
-			sp.center = (float3)(0, 0, -4.f);
+
+			sp.center = (float3)(0, 0, -3.0f);
 			sp.radius = 1.0f;
 
 			float d = ray_sphere(sp, ray);
