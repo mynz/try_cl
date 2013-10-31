@@ -1,4 +1,4 @@
-#define __CL_ENABLE_EXCEPTIONS
+// #define __CL_ENABLE_EXCEPTIONS
 
 #if defined(WIN32)
 #pragma warning(disable:4996)
@@ -172,7 +172,11 @@ int main(void)
 #endif
 
 	cl_int err = CL_SUCCESS;
-	try {
+
+#if defined(__CL_ENABLE_EXCEPTIONS)
+	try
+#endif
+	{
 
 		std::vector<cl::Platform> platforms;
 		cl::Platform::get(&platforms);
@@ -222,7 +226,16 @@ int main(void)
 #endif
 
 		cl::Program program_ = cl::Program(context, source);
-		program_.build(devices);
+		err = program_.build(devices);
+
+		if ( err != CL_SUCCESS ) {
+			std::string str;
+			program_.getBuildInfo(devices[0], CL_PROGRAM_BUILD_LOG, &str);
+			cout << "buid error ocurred[" << err << "]: " << endl << str << endl;
+			exit(-1);
+		}
+
+		assert( err == CL_SUCCESS );
 
 		cl::Kernel kernel(program_, "hello", &err);
 
@@ -344,10 +357,12 @@ int main(void)
 		free(outImage);
 #endif
 
-
-
 	}
+#if defined(__CL_ENABLE_EXCEPTIONS)
 	catch (cl::Error err) {
+
+		if ( err.err() == CL_BUILD_PROGRAM_FAILURE ) { /* do something */ }
+
 		std::cerr 
 			<< "ERROR: "
 			<< err.what()
@@ -356,6 +371,7 @@ int main(void)
 			<< ")"
 			<< std::endl;
 	}
+#endif
 
 	cout << "[Done the function]" << endl;
 	return EXIT_SUCCESS;
