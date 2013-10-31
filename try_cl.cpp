@@ -313,8 +313,8 @@ int main(void)
 			{ { 0.0f, 0.5f, -3.f, 1.f}, 0.3f },
 		};
 
-		// cl::Buffer sphereMem(context, CL_MEM_READ_ONLY, sizeof(sphereArray), NULL, &err);
-		cl::Buffer sphereMem(context, CL_MEM_READ_ONLY, sizeof(sphereArray), sphereArray, &err);
+		cl::Buffer sphereMem(context, CL_MEM_READ_ONLY, sizeof(sphereArray), NULL, &err);
+		// cl::Buffer sphereMem(context, CL_MEM_READ_ONLY, sizeof(sphereArray), sphereArray, &err);
 		assert( err == CL_SUCCESS );
 
 		err = queue.enqueueWriteBuffer(sphereMem, CL_TRUE, 0, sizeof(sphereArray), sphereArray);
