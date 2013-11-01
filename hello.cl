@@ -139,17 +139,20 @@ __kernel void hello(
 			ray.orig = camera_pos;
 			ray.dir  = dir;
 
-			Sphere sp;
 			uchar4 col = blue;
+			float depth = infinity;
+
+			Sphere sp;
 			for ( int s = 0; s < numSpheres; ++s ) {
 				sp = sphere_array[s];
 				float d = ray_sphere(sp, ray);
-#if 1
-				if ( d != infinity ) {
+
+				if ( d < depth ) { // hit
+					depth = d;
 					float3 nrm = normalize((camera_pos + d * dir) - sp.center);
+					// shading.
 					col = from_normal_to_uchar4(nrm);
 				}
-#endif
 			}
 
 			int idx = sy * kWidth + sx;

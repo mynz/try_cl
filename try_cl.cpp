@@ -313,7 +313,7 @@ int main(void)
 			float pad[3]; // 
 		};
 
-#if 1
+#if 0
 		const int kNumSpheres = 2; // 13 == NG
 		// Sphere sphereArray[kNumSpheres];
 		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
