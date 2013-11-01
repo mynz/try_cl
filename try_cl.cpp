@@ -339,7 +339,7 @@ int main(void)
 
 		cl::Buffer sphereMem(context,
 				CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
-				sizeof(sphereArray), sphereArray, &err);
+				kNumSpheres * sizeof(Sphere), sphereArray, &err);
 		assert( err == CL_SUCCESS );
 
 		// err = queue.enqueueWriteBuffer(sphereMem, CL_TRUE, 0, sizeof(sphereArray), sphereArray);
