@@ -16,6 +16,11 @@ typedef struct {
 	float3 clolor;
 } Sphere;
 
+float3 lerp(float3 a, float3 b, float r)
+{
+	return a * (1.f - r) + b * r;
+}
+
 float2 to_world(int x, int y)
 {
 	return (float2) ((float)x / kWidth * 2.f - 1.0f,
@@ -167,7 +172,7 @@ __kernel void hello(
 					float3 nrm = normalize(hit_pos - sp.center.xyz);
 
 					// shading.
-					col = nrm;
+					/* col = nrm; */
 
 #if 1 // phong shading
 					col = phong(nrm, eye_dir) ;
@@ -182,12 +187,13 @@ __kernel void hello(
 							Sphere sp2 = sphere_array[s2];
 							float d2 = ray_sphere(sp2, ray2);
 							if ( d2 != infinity ) {
-								col = yellow;
+								/* col = yellow; */
 
 #if 1 // phong shading
 								float3 hit_pos2 = ray2.orig + d * ray2.dir;
 								float3 nrm = normalize(hit_pos2 - sp2.center.xyz);
-								col = phong(nrm, eye_dir);
+								/* col = phong(nrm, eye_dir); */
+								col = lerp(col, phong(nrm, eye_dir), 0.75f);
 #endif
 							}
 						}
