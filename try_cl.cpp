@@ -245,7 +245,9 @@ int main(void)
 		cl::Kernel kernel(program_, "hello", &err);
 
 		cl::Event event;
-		cl::CommandQueue queue(context, devices[0], 0, &err);
+
+		cl_command_queue_properties prop = 0 | CL_QUEUE_PROFILING_ENABLE ;
+		cl::CommandQueue queue(context, devices[0], prop, &err);
 
 #if 1 // XXX: hello_message
 		char message[32];
@@ -313,8 +315,8 @@ int main(void)
 			float pad[3]; // 
 		};
 
-#if 0
-		const int kNumSpheres = 2; // 13 == NG
+#if 1
+		const int kNumSpheres = 3; // 13 == NG
 		// Sphere sphereArray[kNumSpheres];
 		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
 
@@ -354,8 +356,9 @@ int main(void)
 #endif
 
 
+		cl::Event kernelEvent;
 #if 0
-		err = queue.enqueueTask(kernel, NULL, &event);
+		err = queue.enqueueTask(kernel, NULL, &kernelEvent);
 #else
 		err = queue.enqueueNDRangeKernel(
 				kernel, 
@@ -363,21 +366,40 @@ int main(void)
 				cl::NDRange(1),
 				cl::NullRange,
 				NULL,
-				&event); 
+				&kernelEvent); 
 		assert( err == CL_SUCCESS );
 #endif
 
-		err = event.wait();
+		err = kernelEvent.wait();
 
 		if ( err != CL_SUCCESS ) {
 			// it causes crash.
-			cout << "!! Error: event.wait = " << err << endl;
+			cout << "!! Error: kernelEvent.wait = " << err << endl;
 			exit(1);
 		}
 
 		assert( err == CL_SUCCESS );
 
-		cout << "Done: enqueueNDRangeKernel()" << endl;
+
+		cl_ulong qcnt, scnt, ecnt;
+		err = kernelEvent.getProfilingInfo(CL_PROFILING_COMMAND_QUEUED, &qcnt);
+		assert( err == CL_SUCCESS );
+		err = kernelEvent.getProfilingInfo(CL_PROFILING_COMMAND_START, &scnt);
+		assert( err == CL_SUCCESS );
+		err = kernelEvent.getProfilingInfo(CL_PROFILING_COMMAND_END, &ecnt);
+		assert( err == CL_SUCCESS );
+
+		const cl_ulong NSEC = 1000000000;
+		double elpSec = (double(ecnt - qcnt) / NSEC);
+
+		// cout << "profile[queued, start, end]: "
+			// << (qcnt / NSEC) << ", "
+			// << (scnt / NSEC) << ", "
+			// << (ecnt / NSEC) << ", "
+			// << "duration: " << elpSec
+			// << endl;
+
+		cout << "Done: enqueueNDRangeKernel(): " << elpSec << " Sec" << endl;
 
 
 #if 1 // XXX: hello_message
