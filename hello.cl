@@ -42,6 +42,18 @@ uchar4 from_normal_to_uchar4(float3 norm)
 	return (uchar4)(convert_uchar3(f3), 255);
 }
 
+float3 phong(float3 nrm, float3 eye_dir)
+{
+	const float3 light_dir = normalize((float3)(1, 0.8, 0.55));
+	float3 half = normalize(light_dir - eye_dir);
+
+	float HN = max(dot(half, nrm), 0.000000000f);
+	float3 diff = dot(nrm, light_dir);
+	float3 spec = 1.f * pow(HN, 64);
+	float3 out = diff + spec;
+	return out;
+}
+
 /**
  *
  */
@@ -134,11 +146,11 @@ __kernel void hello(
 			float2 w = to_world(sx, sy);
 
 			float3 screen_center = (float3)(w, -1.f);
-			float3 dir = normalize(screen_center - camera_pos);
+			float3 eye_dir = normalize(screen_center - camera_pos);
 
 			Ray ray;
 			ray.orig = camera_pos;
-			ray.dir  = dir;
+			ray.dir  = eye_dir;
 
 			uchar4 col = blue;
 			float depth = infinity;
@@ -150,12 +162,17 @@ __kernel void hello(
 
 				if ( d < depth ) { // hit
 					depth = d;
-					float3 hit_pos = camera_pos + d * dir;
+					float3 hit_pos = camera_pos + d * eye_dir;
 					float3 nrm = normalize(hit_pos - sp.center);
 
 					// shading.
 					col = from_normal_to_uchar4(nrm);
-#if 1
+
+#if 1 // phong shading
+					col = from_normal_to_uchar4( phong(nrm, eye_dir) );
+#endif
+
+#if 1 // refrection.
 					Ray ray2;
 					ray2.orig = hit_pos;
 					ray2.dir = nrm;
