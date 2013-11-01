@@ -313,7 +313,7 @@ int main(void)
 			float pad[3]; // 
 		};
 
-#if 1
+#if 0
 		const int kNumSpheres = 3;
 		Sphere sphereArray[kNumSpheres];
 
@@ -332,8 +332,8 @@ int main(void)
 #else
 		const int kNumSpheres = 2;
 		Sphere sphereArray[] = {
-			{ { 0.0f, 0.0f, -3.f, 1.f}, 0.5f },
-			{ { 0.0f, 0.5f, -3.f, 1.f}, 0.3f },
+			{ {  0.25f, 0.0f, -3.f, 1.f }, 0.5f },
+			{ { -0.25f, 0.0f, -3.f, 1.f }, 0.5f },
 		};
 #endif
 
