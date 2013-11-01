@@ -316,7 +316,7 @@ int main(void)
 		};
 
 #if 1
-		const int kNumSpheres = 3; // 13 == NG
+		const int kNumSpheres = 7; // 13 == NG
 		// Sphere sphereArray[kNumSpheres];
 		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
 

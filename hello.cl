@@ -121,8 +121,9 @@ __kernel void hello(
 #endif
 
 #if 1 // ray tracing.
-	const uchar4 red  = (uchar4)(0, 0, 255, 255);
-	const uchar4 blue = (uchar4)(255, 0, 0, 255);
+	const uchar4 red  =   (uchar4)(0   , 0   , 255 , 255);
+	const uchar4 blue =   (uchar4)(255 , 0   , 0   , 255);
+	const uchar4 yellow = (uchar4)(0   , 255 , 255 , 255);
 	const float  kRad = 0.4f;
 
 	float3 camera_pos = (float3)(0, 0, 0);
@@ -151,8 +152,22 @@ __kernel void hello(
 					depth = d;
 					float3 hit_pos = camera_pos + d * dir;
 					float3 nrm = normalize(hit_pos - sp.center);
+
 					// shading.
 					col = from_normal_to_uchar4(nrm);
+#if 1
+					Ray ray2;
+					ray2.orig = hit_pos;
+					ray2.dir = nrm;
+					for ( int s2 = 0; s2 < numSpheres; ++s2 ) {
+						if ( s2 != s ) {
+							float d2 = ray_sphere(sphere_array[s2], ray2);
+							if ( d2 != infinity ) {
+								col = yellow;
+							}
+						}
+					}
+#endif
 				}
 			}
 
