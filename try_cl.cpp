@@ -320,6 +320,8 @@ int main(void)
 		// Sphere sphereArray[kNumSpheres];
 		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
 
+		srand(7);
+		// rand();
 		for ( int i = 0; i < kNumSpheres; ++i ) {
 			sphereArray[i].center[0] = RandF() * 4.f - 2.f;
 			sphereArray[i].center[1] = RandF() * 4.f - 2.f;
