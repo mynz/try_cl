@@ -311,8 +311,8 @@ int main(void)
 #if 1
 		struct Sphere {
 			float center[4];
-			float radius;
-			float pad[3]; // 
+			float color[3]; // 
+			float pad;
 		};
 
 #if 1
@@ -320,19 +320,20 @@ int main(void)
 		// Sphere sphereArray[kNumSpheres];
 		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
 
-		srand(7);
-		// rand();
+		const float areaRange = 5.f;
+		srand(11);
+
 		for ( int i = 0; i < kNumSpheres; ++i ) {
-			sphereArray[i].center[0] = RandF() * 4.f - 2.f;
-			sphereArray[i].center[1] = RandF() * 4.f - 2.f;
+			sphereArray[i].center[0] = RandF() * areaRange - (areaRange * 0.5);
+			sphereArray[i].center[1] = RandF() * areaRange - (areaRange * 0.5);
 			sphereArray[i].center[2] = RandF() * -10.f - 1.f;
-			sphereArray[i].radius    = RandF() * 0.5f + 0.5f;
+			sphereArray[i].center[3] = RandF() * 0.5f + 0.5f;
 
 			printf("Sphere: [%f, %f, %f], rad: %f\n",
 					sphereArray[i].center[0],
 					sphereArray[i].center[1],
 					sphereArray[i].center[2],
-					sphereArray[i].radius);
+					sphereArray[i].center[3]);
 		}
 #else
 		const int kNumSpheres = 2;

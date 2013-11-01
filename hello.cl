@@ -12,8 +12,8 @@ typedef struct {
 } Ray;
 
 typedef struct {
-	float3 center;
-	float radius;
+	float4 center; // w = radius
+	float3 clolor;
 } Sphere;
 
 float2 to_world(int x, int y)
@@ -24,9 +24,10 @@ float2 to_world(int x, int y)
 
 float ray_sphere(Sphere sphere, Ray ray)
 {
-	float3 v = sphere.center - ray.orig;
+	float3 v = sphere.center.xyz - ray.orig;
 	float b = dot(v, ray.dir);
-	float disc = b*b - dot(v, v) + sphere.radius * sphere.radius;
+	float radius = sphere.center.w;
+	float disc = b*b - dot(v, v) + radius * radius;
 
 	if (disc < 0) return infinity;
 	float d = sqrt(disc);
@@ -163,7 +164,7 @@ __kernel void hello(
 				if ( d < depth ) { // hit
 					depth = d;
 					float3 hit_pos = camera_pos + d * eye_dir;
-					float3 nrm = normalize(hit_pos - sp.center);
+					float3 nrm = normalize(hit_pos - sp.center.xyz);
 
 					// shading.
 					col = nrm;
@@ -185,7 +186,7 @@ __kernel void hello(
 
 #if 1 // phong shading
 								float3 hit_pos2 = ray2.orig + d * ray2.dir;
-								float3 nrm = normalize(hit_pos2 - sp2.center);
+								float3 nrm = normalize(hit_pos2 - sp2.center.xyz);
 								col = phong(nrm, eye_dir);
 #endif
 							}
