@@ -354,23 +354,28 @@ int main(void)
 
 
 #if 0
-		queue.enqueueTask(kernel, NULL, &event);
+		err = queue.enqueueTask(kernel, NULL, &event);
 #else
-		queue.enqueueNDRangeKernel(
+		err = queue.enqueueNDRangeKernel(
 				kernel, 
 				cl::NullRange,  // must be null in current OpenCL verison.
 				cl::NDRange(1),
 				cl::NullRange,
 				NULL,
 				&event); 
+		assert( err == CL_SUCCESS );
 #endif
 
-		event.wait();
+		err = event.wait();
+		assert( err == CL_SUCCESS );
+
+		cout << "Done: enqueueNDRangeKernel()" << endl;
 
 
 #if 1 // XXX: hello_message
 		err = clEnqueueReadBuffer(queue(), memObj, CL_TRUE, 0,
 				sizeof(message), message, 0, NULL, &event());
+		assert( err == CL_SUCCESS );
 
 		event.wait();
 
