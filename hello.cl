@@ -134,12 +134,11 @@ __kernel void hello(
 #endif
 
 #if 1 // ray tracing.
-	const uchar4 red  =   (uchar4)(0   , 0   , 255 , 255);
-	const uchar4 blue =   (uchar4)(255 , 0   , 0   , 255);
-	const uchar4 yellow = (uchar4)(0   , 255 , 255 , 255);
-	const float  kRad = 0.4f;
+	const float3 red  =   (float3)(1 , 0 , 0);
+	const float3 blue =   (float3)(0 , 0 , 1);
+	const float3 yellow = (float3)(1 , 1 , 0);
 
-	float3 camera_pos = (float3)(0, 0, 0);
+	const float3 camera_pos = (float3)(0, 0, 0);
 
 	for ( int sy = 0; sy < kWidth; ++sy ) {
 		for ( int sx = 0; sx < kWidth; ++sx ) {
@@ -153,7 +152,7 @@ __kernel void hello(
 			ray.orig = camera_pos;
 			ray.dir  = eye_dir;
 
-			uchar4 col = blue;
+			float3 col = blue;
 			float depth = infinity;
 
 			Sphere sp;
@@ -167,10 +166,10 @@ __kernel void hello(
 					float3 nrm = normalize(hit_pos - sp.center);
 
 					// shading.
-					col = from_normal_to_uchar4(nrm);
+					col = nrm;
 
 #if 1 // phong shading
-					col = from_normal_to_uchar4( phong(nrm, eye_dir) );
+					col = phong(nrm, eye_dir) ;
 #endif
 
 #if 1 // refrection.
@@ -187,7 +186,7 @@ __kernel void hello(
 #if 1 // phong shading
 								float3 hit_pos2 = ray2.orig + d * ray2.dir;
 								float3 nrm = normalize(hit_pos2 - sp2.center);
-								col = from_normal_to_uchar4( phong(nrm, eye_dir) );
+								col = phong(nrm, eye_dir);
 #endif
 							}
 						}
@@ -197,7 +196,7 @@ __kernel void hello(
 			}
 
 			int idx = sy * kWidth + sx;
-			outImage[idx] = col;
+			outImage[idx] = (uchar4)(convert_uchar3(col.zyx * (float3)(255)), 255);
 		}
 	}
 #endif
