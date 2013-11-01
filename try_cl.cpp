@@ -152,6 +152,11 @@ bool saveImage(const char *filename, int w, int h, uint8_t *image)
 	return false;
 }
 
+inline float RandF()
+{
+	return (float)rand() / RAND_MAX;
+}
+
 int main(void)
 {
 	const int w = 512, h = 512;
@@ -308,11 +313,29 @@ int main(void)
 			float pad[3]; // 
 		};
 
+#if 1
+		const int kNumSpheres = 3;
+		Sphere sphereArray[kNumSpheres];
+
+		for ( int i = 0; i < kNumSpheres; ++i ) {
+			sphereArray[i].center[0] = RandF() * 4.f - 2.f;
+			sphereArray[i].center[1] = RandF() * 4.f - 2.f;
+			sphereArray[i].center[2] = RandF() * -10.f - 1.f;
+			sphereArray[i].radius    = RandF() * 0.5f + 0.5f;
+
+			printf("Sphere: [%f, %f, %f], rad: %f\n",
+					sphereArray[i].center[0],
+					sphereArray[i].center[1],
+					sphereArray[i].center[2],
+					sphereArray[i].radius);
+		}
+#else
 		const int kNumSpheres = 2;
 		Sphere sphereArray[] = {
 			{ { 0.0f, 0.0f, -3.f, 1.f}, 0.5f },
 			{ { 0.0f, 0.5f, -3.f, 1.f}, 0.3f },
 		};
+#endif
 
 		cl::Buffer sphereMem(context,
 				CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,

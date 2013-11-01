@@ -50,7 +50,6 @@ __kernel void hello(
 		, __global float *mat
 		, __read_only image2d_t image
 		, __global uchar4 *outImage
-		/* , __global float *outImage */
 		, __constant Sphere *sphere_array
 		, const int numSpheres
 		) 
