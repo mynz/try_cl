@@ -51,7 +51,8 @@ __kernel void hello(
 		, __read_only image2d_t image
 		, __global uchar4 *outImage
 		/* , __global float *outImage */
-		, __global Sphere *sphere_array
+		, __constant Sphere *sphere_array
+		, const int numSpheres
 		) 
 {
 	str[0] = 'H';
@@ -141,7 +142,7 @@ __kernel void hello(
 
 			Sphere sp;
 			uchar4 col = blue;
-			for ( int s = 0; s < 2; ++s ) {
+			for ( int s = 0; s < numSpheres; ++s ) {
 				sp = sphere_array[s];
 				float d = ray_sphere(sp, ray);
 				if ( d != infinity ) {

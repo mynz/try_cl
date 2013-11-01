@@ -308,21 +308,25 @@ int main(void)
 			float pad[3]; // 
 		};
 
-		Sphere sphereArray[2] = {
+		const int kNumSpheres = 2;
+		Sphere sphereArray[] = {
 			{ { 0.0f, 0.0f, -3.f, 1.f}, 0.5f },
 			{ { 0.0f, 0.5f, -3.f, 1.f}, 0.3f },
 		};
 
-		cl::Buffer sphereMem(context, CL_MEM_READ_ONLY, sizeof(sphereArray), NULL, &err);
-		// cl::Buffer sphereMem(context, CL_MEM_READ_ONLY, sizeof(sphereArray), sphereArray, &err);
+		cl::Buffer sphereMem(context,
+				CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
+				sizeof(sphereArray), sphereArray, &err);
 		assert( err == CL_SUCCESS );
 
-		err = queue.enqueueWriteBuffer(sphereMem, CL_TRUE, 0, sizeof(sphereArray), sphereArray);
-		assert( err == CL_SUCCESS );
+		// err = queue.enqueueWriteBuffer(sphereMem, CL_TRUE, 0, sizeof(sphereArray), sphereArray);
+		// assert( err == CL_SUCCESS );
 
 		err = kernel.setArg(4, sphereMem);
 		assert( err == CL_SUCCESS );
 
+		err = kernel.setArg(5, kNumSpheres);
+		assert( err == CL_SUCCESS );
 #endif
 
 
