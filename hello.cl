@@ -35,7 +35,7 @@ float ray_sphere(Sphere sphere, Ray ray)
 	return (t1 > 0 ? t1 : t2);
 }
 
-uchar4 to_color_from_normal(float3 norm)
+uchar4 from_normal_to_uchar4(float3 norm)
 {
 	/* float3 f3 = norm * (float3)(127) + (float3)(127); */
 	float3 f3 = (norm * (float3)(0.5) + (float3)(0.5)) * (float3)(255);
@@ -147,7 +147,7 @@ __kernel void hello(
 				if ( d != infinity ) {
 					float3 nrm = normalize((camera_pos + d * dir) - sp.center);
 					/* col = (uchar4)(convert_uchar3(nrm * (float3)(255, 255, 255)), 255); // XXX */
-					col = to_color_from_normal(nrm);
+					col = from_normal_to_uchar4(nrm);
 				}
 			}
 
