@@ -6,11 +6,6 @@ const sampler_t s_linear  = CLK_FILTER_LINEAR  | CLK_NORMALIZED_COORDS_FALSE | C
 #define kWidth 512
 #define infinity (100000000.f)
 
-float2 to_world(int x, int y)
-{
-	return (float2) ((float)x / kWidth * 2.f - 1.0f,
-					((float)y / kWidth * 2.f - 1.0f));
-}
 
 typedef struct {
 	float3 orig, dir;
@@ -20,6 +15,12 @@ typedef struct {
 	float3 center;
 	float radius;
 } Sphere;
+
+float2 to_world(int x, int y)
+{
+	return (float2) ((float)x / kWidth * 2.f - 1.0f,
+					((float)y / kWidth * 2.f - 1.0f));
+}
 
 float ray_sphere(Sphere sphere, Ray ray)
 {
@@ -45,9 +46,9 @@ uchar4 from_normal_to_uchar4(float3 norm)
 float3 phong(float3 nrm, float3 eye_dir)
 {
 	const float3 light_dir = normalize((float3)(1, 0.8, 0.55));
-	float3 half = normalize(light_dir - eye_dir);
+	float3 hlf = normalize(light_dir - eye_dir);
 
-	float HN = max(dot(half, nrm), 0.000000000f);
+	float HN = max(dot(hlf, nrm), 0.000000000f);
 	float3 diff = dot(nrm, light_dir);
 	float3 spec = 1.f * pow(HN, 64);
 	float3 out = diff + spec;
