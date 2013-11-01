@@ -313,9 +313,10 @@ int main(void)
 			float pad[3]; // 
 		};
 
-#if 0
-		const int kNumSpheres = 3;
-		Sphere sphereArray[kNumSpheres];
+#if 1
+		const int kNumSpheres = 2; // 13 == NG
+		// Sphere sphereArray[kNumSpheres];
+		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
 
 		for ( int i = 0; i < kNumSpheres; ++i ) {
 			sphereArray[i].center[0] = RandF() * 4.f - 2.f;
@@ -367,6 +368,13 @@ int main(void)
 #endif
 
 		err = event.wait();
+
+		if ( err != CL_SUCCESS ) {
+			// it causes crash.
+			cout << "!! Error: event.wait = " << err << endl;
+			exit(1);
+		}
+
 		assert( err == CL_SUCCESS );
 
 		cout << "Done: enqueueNDRangeKernel()" << endl;
