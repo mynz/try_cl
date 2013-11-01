@@ -149,7 +149,8 @@ __kernel void hello(
 
 				if ( d < depth ) { // hit
 					depth = d;
-					float3 nrm = normalize((camera_pos + d * dir) - sp.center);
+					float3 hit_pos = camera_pos + d * dir;
+					float3 nrm = normalize(hit_pos - sp.center);
 					// shading.
 					col = from_normal_to_uchar4(nrm);
 				}
