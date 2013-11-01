@@ -178,9 +178,16 @@ __kernel void hello(
 					ray2.dir = nrm;
 					for ( int s2 = 0; s2 < numSpheres; ++s2 ) {
 						if ( s2 != s ) {
-							float d2 = ray_sphere(sphere_array[s2], ray2);
+							Sphere sp2 = sphere_array[s2];
+							float d2 = ray_sphere(sp2, ray2);
 							if ( d2 != infinity ) {
 								col = yellow;
+
+#if 1 // phong shading
+								float3 hit_pos2 = ray2.orig + d * ray2.dir;
+								float3 nrm = normalize(hit_pos2 - sp2.center);
+								col = from_normal_to_uchar4( phong(nrm, eye_dir) );
+#endif
 							}
 						}
 					}
