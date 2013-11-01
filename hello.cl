@@ -144,11 +144,12 @@ __kernel void hello(
 			for ( int s = 0; s < numSpheres; ++s ) {
 				sp = sphere_array[s];
 				float d = ray_sphere(sp, ray);
+#if 1
 				if ( d != infinity ) {
 					float3 nrm = normalize((camera_pos + d * dir) - sp.center);
-					/* col = (uchar4)(convert_uchar3(nrm * (float3)(255, 255, 255)), 255); // XXX */
 					col = from_normal_to_uchar4(nrm);
 				}
+#endif
 			}
 
 			int idx = sy * kWidth + sx;
