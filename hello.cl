@@ -3,6 +3,11 @@
 #define kWidth 512
 #define infinity (100000000.f)
 
+#define red     (float3)(1    , 0    , 0);
+#define blue    (float3)(0    , 0    , 1);
+#define yellow  (float3)(1    , 1    , 0);
+#define gray    (float3)(0.5f , 0.5f , 0.5f);
+
 const sampler_t s_nearest = CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 const sampler_t s_linear  = CLK_FILTER_LINEAR  | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 
@@ -116,9 +121,6 @@ __kernel void hello(
 #endif
 
 #if 1 // ray tracing.
-	const float3 red  =   (float3)(1 , 0 , 0);
-	const float3 blue =   (float3)(0 , 0 , 1);
-	const float3 yellow = (float3)(1 , 1 , 0);
 
 	const float3 camera_pos = (float3)(0, 0, 0);
 
@@ -134,7 +136,7 @@ __kernel void hello(
 			ray.orig = camera_pos;
 			ray.dir  = eye_dir;
 
-			float3 col = blue;
+			float3 col = gray;
 			float depth = infinity;
 
 			Sphere sp;

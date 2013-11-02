@@ -316,18 +316,18 @@ int main(void)
 		};
 
 #if 1
-		const int kNumSpheres = 7; // 13 == NG
+		const int kNumSpheres = 6; // 13 == NG
 		// Sphere sphereArray[kNumSpheres];
 		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
 
 		const float areaRange = 5.f;
-		srand(11);
+		srand(19);
 
 		for ( int i = 0; i < kNumSpheres; ++i ) {
 			sphereArray[i].center[0] = RandF() * areaRange - (areaRange * 0.5);
 			sphereArray[i].center[1] = RandF() * areaRange - (areaRange * 0.5);
-			sphereArray[i].center[2] = RandF() * -10.f - 1.f;
-			sphereArray[i].center[3] = RandF() * 0.5f + 0.5f;
+			sphereArray[i].center[2] = RandF() * -10.f - 3.f;
+			sphereArray[i].center[3] = RandF() * 0.5f + 0.8f;
 
 			printf("Sphere: [%f, %f, %f], rad: %f\n",
 					sphereArray[i].center[0],
