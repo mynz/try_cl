@@ -3,6 +3,16 @@
 const sampler_t s_nearest = CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 const sampler_t s_linear  = CLK_FILTER_LINEAR  | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 
+
+__constant const float3 color_table[] = {
+	(float3)(1, 0, 0),
+	(float3)(0, 1, 0),
+	(float3)(1, 1, 0),
+};
+
+__constant int num_color_table = sizeof(color_table) / sizeof(color_table[0]);
+
+
 #define kWidth 512
 #define infinity (100000000.f)
 
@@ -49,14 +59,14 @@ uchar4 from_normal_to_uchar4(float3 norm)
 	return (uchar4)(convert_uchar3(f3), 255);
 }
 
-float3 phong(float3 nrm, float3 eye_dir)
+float3 phong(float3 nrm, float3 eye_dir, int mat_idx)
 {
 	const float3 light_dir = normalize((float3)(1, 0.8, 0.55));
 	float3 hlf = normalize(light_dir - eye_dir);
 
 	float HN = max(dot(hlf, nrm), 0.000000000f);
-	float3 diff = dot(nrm, light_dir);
-	float3 spec = 1.f * pow(HN, 64);
+	float3 diff = color_table[mat_idx] * dot(nrm, light_dir);
+	float3 spec = 1.f * pow(HN, 32);
 	float3 out = diff + spec;
 	return out;
 }
@@ -175,7 +185,7 @@ __kernel void hello(
 					/* col = nrm; */
 
 #if 1 // phong shading
-					col = phong(nrm, eye_dir) ;
+					col = phong(nrm, eye_dir, s % num_color_table) ;
 #endif
 
 #if 1 // refrection.
@@ -193,7 +203,7 @@ __kernel void hello(
 								float3 hit_pos2 = ray2.orig + d * ray2.dir;
 								float3 nrm = normalize(hit_pos2 - sp2.center.xyz);
 								/* col = phong(nrm, eye_dir); */
-								col = lerp(col, phong(nrm, eye_dir), 0.75f);
+								col = lerp(col, phong(nrm, eye_dir, s2 % num_color_table), 0.75f);
 #endif
 							}
 						}
