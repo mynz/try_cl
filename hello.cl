@@ -1,8 +1,10 @@
 /* vim: set ft=c: */
 
+#define kWidth 512
+#define infinity (100000000.f)
+
 const sampler_t s_nearest = CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 const sampler_t s_linear  = CLK_FILTER_LINEAR  | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
-
 
 __constant const float3 color_table[] = {
 	(float3)(1, 0, 0),
@@ -11,11 +13,6 @@ __constant const float3 color_table[] = {
 };
 
 __constant int num_color_table = sizeof(color_table) / sizeof(color_table[0]);
-
-
-#define kWidth 512
-#define infinity (100000000.f)
-
 
 typedef struct {
 	float3 orig, dir;
@@ -54,7 +51,6 @@ float ray_sphere(Sphere sphere, Ray ray)
 
 uchar4 from_normal_to_uchar4(float3 norm)
 {
-	/* float3 f3 = norm * (float3)(127) + (float3)(127); */
 	float3 f3 = (norm * (float3)(0.5) + (float3)(0.5)) * (float3)(255);
 	return (uchar4)(convert_uchar3(f3), 255);
 }
@@ -106,10 +102,6 @@ __kernel void hello(
 	}
 
 	mat[15] = get_global_id(0);
-	/* mat[0] = (1.0f == 1.0f); */
-	/* mat[15] = ((float4)(1, 1, 1, 1) == (float4)(1, 1, 1, 1)).x; */
-	/* mat[15] = as_float(((float4)(1, 1, 1, 1) == (float4)(1, 1, 1, 1)).x); */
-
 
 #if 1
 	int x, y;
@@ -119,32 +111,6 @@ __kernel void hello(
 			float4 col = read_imagef(image, s_linear, pos);
 			int i = 4 * y + x;
 			mat[i] = col.x;
-		}
-	}
-#endif
-
-#if 0 // ok
-	uchar4 col = (uchar4)(0, 10, 100, 0);
-	for ( int i = 0; i < 3 * 256 * 256; ++i ) {
-		outImage[i] = col;
-	}
-#endif
-
-
-#if 0 // ray tracing.
-	const uchar4 red  = (uchar4)(255, 0, 0, 0);
-	const uchar4 blue = (uchar4)(0, 255, 0, 0);
-	const float  kRad = 0.4f;
-
-	for ( int sy = 0; sy < kWidth; ++sy ) {
-		for ( int sx = 0; sx < kWidth; ++sx ) {
-
-			int idx = sx * kWidth + sy;
-			float2 w = to_world(sx, sy);
-			float len2 = dot(w, w);
-
-			uchar4 col = len2 < (kRad * kRad) ? red : blue;
-			outImage[idx] = col;
 		}
 	}
 #endif
@@ -180,10 +146,6 @@ __kernel void hello(
 					depth = d;
 					float3 hit_pos = camera_pos + d * eye_dir;
 					float3 nrm = normalize(hit_pos - sp.center.xyz);
-
-					// shading.
-					/* col = nrm; */
-
 #if 1 // phong shading
 					col = phong(nrm, eye_dir, s % num_color_table) ;
 #endif
@@ -197,12 +159,9 @@ __kernel void hello(
 							Sphere sp2 = sphere_array[s2];
 							float d2 = ray_sphere(sp2, ray2);
 							if ( d2 != infinity ) {
-								/* col = yellow; */
-
 #if 1 // phong shading
 								float3 hit_pos2 = ray2.orig + d * ray2.dir;
 								float3 nrm = normalize(hit_pos2 - sp2.center.xyz);
-								/* col = phong(nrm, eye_dir); */
 								col = lerp(col, phong(nrm, eye_dir, s2 % num_color_table), 0.75f);
 #endif
 							}
