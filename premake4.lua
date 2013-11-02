@@ -4,5 +4,6 @@ solution "MySolution"
 	project "try_cl"
 		kind "ConsoleApp"
 		language "C++"
-		files { "**.cpp" }
+		-- files { "**.cpp" }
+		files { "try_cl.cpp" }
 		linkoptions { "-framework OpenCL" }

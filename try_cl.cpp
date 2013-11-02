@@ -159,23 +159,6 @@ inline float RandF()
 
 int main(void)
 {
-	const int w = 512, h = 512;
-	size_t outImageByte = w * h * 4;
-#if 0
-	uint8_t *outImage = (uint8_t*)malloc(outImageByte);
-	memset(outImage, 0xcc, outImageByte);
-
-	/*
-	 * uint8_t *p = outImage;
-	 * for ( int i = 0; i < w * h; ++i ) {
-	 *     *p++ = 0xff; *p++ = 0x88; *p++ = 0x22; *p++ = 0x00;
-	 * }
-	 */
-
-	// saveImage("out.bmp", w, h, outImage);
-	// free(outImage);
-#endif
-
 	cl_int err = CL_SUCCESS;
 
 #if defined(__CL_ENABLE_EXCEPTIONS)
@@ -211,10 +194,6 @@ int main(void)
 		}
 #endif
 
-#if 0
-		cl::Program::Sources source(1,
-				std::make_pair(helloStr, strlen(helloStr)));
-#else
 		string str;
 		{
 			std::stringstream ss;
@@ -228,7 +207,6 @@ int main(void)
 
 		cl::Program::Sources source(1,
 				std::make_pair(str.c_str(), str.size()));
-#endif
 
 		cl::Program program_ = cl::Program(context, source);
 		err = program_.build(devices);
@@ -250,119 +228,21 @@ int main(void)
 		cl::CommandQueue queue(context, devices[0], prop, &err);
 
 #if 1 // XXX: hello_message
-		char message[32];
 
-		cl_mem memObj = clCreateBuffer(context(), CL_MEM_READ_WRITE, 
-				sizeof(message), NULL, &err);
+		cl::Buffer scalersBuf(context, CL_MEM_READ_WRITE , 32 * sizeof(float), NULL, &err);
+		assert( err == CL_SUCCESS );
+		err = kernel.setArg(0, scalersBuf);
 		assert( err == CL_SUCCESS );
 
-		float mat[16];
-		for ( int i = 0; i < 16; ++i ) {
-			mat[i] = float(i);
-		}
-
-		cl::Buffer matObj(context, CL_MEM_READ_WRITE , sizeof(mat), NULL, &err);
+		// 
+		cl::Buffer vectorsBuf(context, CL_MEM_READ_WRITE , 32 * 4 * sizeof(float), NULL, &err);
+		assert( err == CL_SUCCESS );
+		err = kernel.setArg(1, vectorsBuf);
 		assert( err == CL_SUCCESS );
 
-		err = queue.enqueueWriteBuffer( matObj, CL_TRUE, 0, sizeof(mat), (void*)mat);
-		assert( err == CL_SUCCESS );
-
-		err = clSetKernelArg(kernel(), 0, sizeof(cl_mem), &memObj);
-		assert( err == CL_SUCCESS );
-
-		err = kernel.setArg(1, matObj);
-		// err = kernel.setArg(1, sizeof(mat), mat);
-		assert( err == CL_SUCCESS );
 #endif
-
-
-#if 1 // input image.
-		float imgSrc[3*3] = {
-			0, 1, 0,
-			1, 0, 0,
-			0, 1, 0,
-		};
-
-		cl::Image2D imgObj(context, CL_MEM_READ_ONLY,
-				cl::ImageFormat(CL_R, CL_FLOAT),
-				3, 3, 0, NULL, &err);
-
-		cl::size_t<3> origin; origin[0] = origin[1] = origin[2] = 0;
-		cl::size_t<3> region; region[0] = 3; region[1] = 3; region[2] = 1;
-
-		err = queue.enqueueWriteImage(imgObj, CL_TRUE, origin, region, 
-				0, 0, (void*)imgSrc);
-		assert( err == CL_SUCCESS );
-
-		kernel.setArg(2, imgObj);
-#endif
-
-
-#if 1 // outImage
-		cl::Buffer outImageMem(context, CL_MEM_WRITE_ONLY, outImageByte, NULL, &err); 
-		assert( err == CL_SUCCESS );
-
-		// err = queue.enqueueWriteBuffer( outImageMem, CL_TRUE, 0, sizeof(outImageMem), (void*)outImage);
-		
-		err = kernel.setArg(3, outImageMem);
-		assert( err == CL_SUCCESS );
-#endif
-
-#if 1
-		struct Sphere {
-			float center[4];
-			float color[3]; // 
-			float pad;
-		};
-
-#if 1
-		const int kNumSpheres = 6; // 13 == NG
-		// Sphere sphereArray[kNumSpheres];
-		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
-
-		const float areaRange = 5.f;
-		srand(19);
-
-		for ( int i = 0; i < kNumSpheres; ++i ) {
-			sphereArray[i].center[0] = RandF() * areaRange - (areaRange * 0.5);
-			sphereArray[i].center[1] = RandF() * areaRange - (areaRange * 0.5);
-			sphereArray[i].center[2] = RandF() * -10.f - 3.f;
-			sphereArray[i].center[3] = RandF() * 0.5f + 0.8f;
-
-			printf("Sphere: [%f, %f, %f], rad: %f\n",
-					sphereArray[i].center[0],
-					sphereArray[i].center[1],
-					sphereArray[i].center[2],
-					sphereArray[i].center[3]);
-		}
-#else
-		const int kNumSpheres = 2;
-		Sphere sphereArray[] = {
-			{ {  0.25f, 0.0f, -3.f, 1.f }, 0.5f },
-			{ { -0.25f, 0.0f, -3.f, 1.f }, 0.5f },
-		};
-#endif
-
-		cl::Buffer sphereMem(context,
-				CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
-				kNumSpheres * sizeof(Sphere), sphereArray, &err);
-		assert( err == CL_SUCCESS );
-
-		// err = queue.enqueueWriteBuffer(sphereMem, CL_TRUE, 0, sizeof(sphereArray), sphereArray);
-		// assert( err == CL_SUCCESS );
-
-		err = kernel.setArg(4, sphereMem);
-		assert( err == CL_SUCCESS );
-
-		err = kernel.setArg(5, kNumSpheres);
-		assert( err == CL_SUCCESS );
-#endif
-
 
 		cl::Event kernelEvent;
-#if 0
-		err = queue.enqueueTask(kernel, NULL, &kernelEvent);
-#else
 		err = queue.enqueueNDRangeKernel(
 				kernel, 
 				cl::NullRange,  // must be null in current OpenCL verison.
@@ -370,8 +250,8 @@ int main(void)
 				cl::NullRange,
 				NULL,
 				&kernelEvent); 
+		// cout << "err: " << err << endl;
 		assert( err == CL_SUCCESS );
-#endif
 
 		err = kernelEvent.wait();
 
@@ -383,7 +263,6 @@ int main(void)
 
 		assert( err == CL_SUCCESS );
 
-
 		cl_ulong qcnt, scnt, ecnt;
 		err = kernelEvent.getProfilingInfo(CL_PROFILING_COMMAND_QUEUED, &qcnt);
 		assert( err == CL_SUCCESS );
@@ -391,73 +270,30 @@ int main(void)
 		assert( err == CL_SUCCESS );
 		err = kernelEvent.getProfilingInfo(CL_PROFILING_COMMAND_END, &ecnt);
 		assert( err == CL_SUCCESS );
-
 		const cl_ulong NSEC = 1000000000;
 		double elpSec = (double(ecnt - qcnt) / NSEC);
-
-		// cout << "profile[queued, start, end]: "
-			// << (qcnt / NSEC) << ", "
-			// << (scnt / NSEC) << ", "
-			// << (ecnt / NSEC) << ", "
-			// << "duration: " << elpSec
-			// << endl;
-
 		cout << "Done: enqueueNDRangeKernel(): " << elpSec << " Sec" << endl;
 
 
 #if 1 // XXX: hello_message
-		err = clEnqueueReadBuffer(queue(), memObj, CL_TRUE, 0,
-				sizeof(message), message, 0, NULL, &event());
+		float scalers[32];
+		err = clEnqueueReadBuffer(queue(), scalersBuf(), CL_TRUE, 0,
+				32 * sizeof(float), &scalers[0], 0, NULL, NULL);
 		assert( err == CL_SUCCESS );
-
-		event.wait();
-
-		cout << "read err: " << err << endl;
-		cout << "RESULT MESSAGE IS [" << message << "]" << endl;
-		cout << "read: " << message << endl;
-
-		printf("message[15]: '%d'\n", message[15]);
-
-
-		// for ( int i = 0; i < 16; ++i ) {
-			// cout << "src mat[" << i << "]: " << mat[i] << endl;
-		// }
-
-		err = clEnqueueReadBuffer(queue(), matObj(), CL_TRUE, 0,
-				sizeof(mat), &mat[0], 0, NULL, NULL);
-		// err = queue.enqueueReadBuffer(matObj, CL_TRUE, 0, sizeof(mat), mat, NULL, &event);
-		assert( err == CL_SUCCESS );
-
-		// Sleep(3000);
 
 		for ( int i = 0; i < 16; ++i ) {
-			cout << "dst mat[" << i << "]: " << mat[i] << endl;
+			cout << "dst scalers[" << i << "]: " << scalers[i] << endl;
 		}
 #endif
 
-#if 1
-		uint8_t *outImage = (uint8_t*)malloc(outImageByte);
-		memset(outImage, 0xcc, outImageByte);
-		err = queue.enqueueReadBuffer(outImageMem, CL_TRUE, 0,
-				outImageByte, outImage, NULL, NULL);
-		assert( err == CL_SUCCESS );
-
-		saveImage("out.bmp", w, h, outImage);
-		free(outImage);
-#endif
 
 	}
 #if defined(__CL_ENABLE_EXCEPTIONS)
 	catch (cl::Error err) {
-
 		if ( err.err() == CL_BUILD_PROGRAM_FAILURE ) { /* do something */ }
-
 		std::cerr 
-			<< "ERROR: "
-			<< err.what()
-			<< "("
-			<< err.err()
-			<< ")"
+			<< "ERROR: " << err.what()
+			<< "(" << err.err() << ")"
 			<< std::endl;
 	}
 #endif
