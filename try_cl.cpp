@@ -246,8 +246,8 @@ int main(void)
 		err = queue.enqueueNDRangeKernel(
 				kernel, 
 				cl::NullRange,  // must be null in current OpenCL verison.
-				cl::NDRange(1),
-				cl::NullRange,
+				cl::NDRange(12),
+				cl::NDRange(3, 0, 0),
 				NULL,
 				&kernelEvent); 
 		// cout << "err: " << err << endl;
@@ -281,7 +281,7 @@ int main(void)
 				32 * sizeof(float), &scalers[0], 0, NULL, NULL);
 		assert( err == CL_SUCCESS );
 
-		for ( int i = 0; i < 16; ++i ) {
+		for ( int i = 0; i < 32; ++i ) {
 			cout << "dst scalers[" << i << "]: " << scalers[i] << endl;
 		}
 #endif
