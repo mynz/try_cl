@@ -24,6 +24,8 @@
 
 using namespace std;
 
+const size_t kWidth = 512;
+
 const char * helloStr  = "__kernel void "
                          "hello(void) "
                          "{ "
@@ -239,15 +241,21 @@ int main(void)
 		assert( err == CL_SUCCESS );
 		err = kernel.setArg(1, vectorsBuf);
 		assert( err == CL_SUCCESS );
+#endif
 
+#if 1
+		cl::Buffer pixels(context, CL_MEM_WRITE_ONLY, 4 * kWidth * kWidth, NULL, &err);
+		assert( err == CL_SUCCESS );
+		err = kernel.setArg(2, pixels);
+		assert( err == CL_SUCCESS );
 #endif
 
 		cl::Event kernelEvent;
 		err = queue.enqueueNDRangeKernel(
 				kernel, 
 				cl::NullRange,  // must be null in current OpenCL verison.
-				cl::NDRange(12),
-				cl::NDRange(3, 0, 0),
+				cl::NDRange(4),
+				cl::NDRange(2, 0, 0),
 				NULL,
 				&kernelEvent); 
 		// cout << "err: " << err << endl;
@@ -284,6 +292,17 @@ int main(void)
 		for ( int i = 0; i < 32; ++i ) {
 			cout << "dst scalers[" << i << "]: " << scalers[i] << endl;
 		}
+#endif
+
+#if 1
+		size_t imageSize = (4 * kWidth * kWidth);
+		uint32_t *image = (uint32_t*)malloc(imageSize);
+		err = queue.enqueueReadBuffer(pixels, CL_TRUE, 0, imageSize, image);
+		assert( err == CL_SUCCESS );
+
+		saveImage("out.bmp", kWidth, kWidth, (uint8_t*)image);
+
+		free(image);
 #endif
 
 
