@@ -241,6 +241,9 @@ int main(void)
 		assert( err == CL_SUCCESS );
 		err = kernel.setArg(1, vectorsBuf);
 		assert( err == CL_SUCCESS );
+
+		cout << "CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE: " << 
+			kernel.getWorkGroupInfo<CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE>(devices[0], &err) << endl;
 #endif
 
 #if 1
