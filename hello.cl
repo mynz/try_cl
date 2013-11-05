@@ -31,7 +31,7 @@ __kernel void hello(
 		for ( int x = 0; x < kWidth; ++x ) {
 
 			int i = x + y * kWidth;
-			pixels[i] = (uchar4)(155, 0, 0, 255);
+			pixels[i] = (uchar4)(155, 0, 0, 255).zyxw;
 		}
 	}
 
