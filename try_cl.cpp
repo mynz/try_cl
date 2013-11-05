@@ -274,7 +274,6 @@ int main(void)
 		assert( err == CL_SUCCESS );
 #endif
 
-
 #if 1 // input image.
 		float imgSrc[3*3] = {
 			0, 1, 0,
@@ -323,7 +322,7 @@ int main(void)
 		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
 
 		const float areaRange = 5.f;
-		srand(19);
+		srand(22);
 
 		for ( int i = 0; i < kNumSpheres; ++i ) {
 			sphereArray[i].center[0] = RandF() * areaRange - (areaRange * 0.5f);
@@ -350,14 +349,31 @@ int main(void)
 				kNumSpheres * sizeof(Sphere), sphereArray, &err);
 		assert( err == CL_SUCCESS );
 
-		// err = queue.enqueueWriteBuffer(sphereMem, CL_TRUE, 0, sizeof(sphereArray), sphereArray);
-		// assert( err == CL_SUCCESS );
-
 		err = kernel.setArg(4, sphereMem);
 		assert( err == CL_SUCCESS );
+#endif
 
-		err = kernel.setArg(5, kNumSpheres);
-		assert( err == CL_SUCCESS );
+#if 1
+	struct Vec4 { float x, y, z, w; };
+	Vec4 colorTable[] = {
+		{ 1, 0, 0,   0},
+		{ 0, 1, 0,   0},
+		{ 1, 1, 0,   0},
+	};
+	cl::Buffer colorTableMem(context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
+			sizeof(colorTable), colorTable, &err);
+	err = kernel.setArg(5, colorTableMem);
+	assert( err == CL_SUCCESS );
+
+
+	uint32_t misc[] = {
+		kNumSpheres,
+		sizeof(colorTable) / sizeof(colorTable[0]),
+	};
+
+	err = kernel.setArg(6, sizeof(misc), misc);
+	assert( err == CL_SUCCESS );
+
 #endif
 
 
@@ -419,7 +435,6 @@ int main(void)
 		cout << "read: " << message << endl;
 
 		printf("message[15]: '%d'\n", message[15]);
-
 
 		// for ( int i = 0; i < 16; ++i ) {
 			// cout << "src mat[" << i << "]: " << mat[i] << endl;

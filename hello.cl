@@ -3,21 +3,13 @@
 #define kWidth 512
 #define infinity (100000000.f)
 
-#define red     (float3)(1    , 0    , 0);
-#define blue    (float3)(0    , 0    , 1);
-#define yellow  (float3)(1    , 1    , 0);
-#define gray    (float3)(0.5f , 0.5f , 0.5f);
+#define red     (float3)(1    , 0    , 0)
+#define blue    (float3)(0    , 0    , 1)
+#define yellow  (float3)(1    , 1    , 0)
+#define gray    (float3)(0.5f , 0.5f , 0.5f)
 
 const sampler_t s_nearest = CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
 const sampler_t s_linear  = CLK_FILTER_LINEAR  | CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE;
-
-__constant const float3 color_table[] = {
-	(float3)(1, 0, 0),
-	(float3)(0, 1, 0),
-	(float3)(1, 1, 0),
-};
-
-__constant int num_color_table = sizeof(color_table) / sizeof(color_table[0]);
 
 typedef struct {
 	float3 orig, dir;
@@ -27,6 +19,11 @@ typedef struct {
 	float4 center; // w = radius
 	float3 clolor;
 } Sphere;
+
+typedef struct {
+	int num_spheres;
+	int num_colors;
+} Misc;
 
 float3 lerp(float3 a, float3 b, float r)
 {
@@ -60,13 +57,13 @@ uchar4 from_normal_to_uchar4(float3 norm)
 	return (uchar4)(convert_uchar3(f3), 255);
 }
 
-float3 phong(float3 nrm, float3 eye_dir, int mat_idx)
+float3 phong(float3 nrm, float3 eye_dir, float3 diffuse_color)
 {
 	const float3 light_dir = normalize((float3)(1, 0.8, 0.55));
 	float3 hlf = normalize(light_dir - eye_dir);
 
 	float HN = max(dot(hlf, nrm), 0.000000000f);
-	float3 diff = color_table[mat_idx] * dot(nrm, light_dir);
+	float3 diff = diffuse_color * dot(nrm, light_dir);
 	float3 spec = 1.f * pow(HN, 32);
 	float3 out = diff + spec;
 	return out;
@@ -81,7 +78,8 @@ __kernel void hello(
 		, __read_only image2d_t image
 		, __global uchar4 *outImage
 		, __constant Sphere *sphere_array
-		, const int numSpheres
+		, __constant float3* color_table
+		, const Misc misc
 		) 
 {
 	str[0] = 'H';
@@ -108,7 +106,12 @@ __kernel void hello(
 
 	mat[15] = get_global_id(0);
 
-#if 1
+	mat[12] = 777;
+	mat[13] = misc.num_spheres;
+	mat[14] = misc.num_colors;
+
+
+#if 0
 	int x, y;
 	for ( y = 0; y < 4; ++y ) {
 		for ( x = 0; x < 4; ++x ) {
@@ -140,7 +143,7 @@ __kernel void hello(
 			float depth = infinity;
 
 			Sphere sp;
-			for ( int s = 0; s < numSpheres; ++s ) {
+			for ( int s = 0; s < misc.num_spheres; ++s ) {
 				sp = sphere_array[s];
 				float d = ray_sphere(sp, ray);
 
@@ -149,14 +152,15 @@ __kernel void hello(
 					float3 hit_pos = camera_pos + d * eye_dir;
 					float3 nrm = normalize(hit_pos - sp.center.xyz);
 #if 1 // phong shading
-					col = phong(nrm, eye_dir, s % num_color_table) ;
+					/* col = phong(nrm, eye_dir, red) ; */
+					col = phong(nrm, eye_dir, color_table[s % misc.num_colors]) ;
 #endif
 
 #if 1 // refrection.
 					Ray ray2;
 					ray2.orig = hit_pos;
 					ray2.dir = nrm;
-					for ( int s2 = 0; s2 < numSpheres; ++s2 ) {
+					for ( int s2 = 0; s2 < misc.num_spheres; ++s2 ) {
 						if ( s2 != s ) {
 							Sphere sp2 = sphere_array[s2];
 							float d2 = ray_sphere(sp2, ray2);
@@ -164,7 +168,7 @@ __kernel void hello(
 #if 1 // phong shading
 								float3 hit_pos2 = ray2.orig + d * ray2.dir;
 								float3 nrm = normalize(hit_pos2 - sp2.center.xyz);
-								col = lerp(col, phong(nrm, eye_dir, s2 % num_color_table), 0.75f);
+								col = lerp(col, phong(nrm, eye_dir, color_table[s2 % misc.num_colors]), 0.75f);
 #endif
 							}
 						}
