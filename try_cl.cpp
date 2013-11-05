@@ -267,11 +267,10 @@ int main(void)
 		err = queue.enqueueWriteBuffer( matObj, CL_TRUE, 0, sizeof(mat), (void*)mat);
 		assert( err == CL_SUCCESS );
 
-		err = clSetKernelArg(kernel(), 0, sizeof(cl_mem), &memObj);
+		err = kernel.setArg(0, memObj);
 		assert( err == CL_SUCCESS );
 
 		err = kernel.setArg(1, matObj);
-		// err = kernel.setArg(1, sizeof(mat), mat);
 		assert( err == CL_SUCCESS );
 #endif
 
@@ -327,8 +326,8 @@ int main(void)
 		srand(19);
 
 		for ( int i = 0; i < kNumSpheres; ++i ) {
-			sphereArray[i].center[0] = RandF() * areaRange - (areaRange * 0.5);
-			sphereArray[i].center[1] = RandF() * areaRange - (areaRange * 0.5);
+			sphereArray[i].center[0] = RandF() * areaRange - (areaRange * 0.5f);
+			sphereArray[i].center[1] = RandF() * areaRange - (areaRange * 0.5f);
 			sphereArray[i].center[2] = RandF() * -10.f - 3.f;
 			sphereArray[i].center[3] = RandF() * 0.5f + 0.8f;
 
