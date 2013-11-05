@@ -27,12 +27,10 @@ __kernel void hello(
 	/* scalers[30] = get_global_size(0); */
 	/* scalers[31] = job_width; */
 
-	uchar4 *p = (uchar4*)pixels;
 	for ( int y = 0; y < kWidth; ++y ) {
-		for ( int x = 0; x < kWidth; ++x, ++p ) {
-			*p = (uchar4)(155, 100, 100, 255);
+		for ( int x = 0; x < kWidth; ++x ) {
 
-			int i = x * y * kWidth;
+			int i = x + y * kWidth;
 			pixels[i] = (uchar4)(155, 0, 0, 255);
 		}
 	}
