@@ -40,13 +40,10 @@ __kernel void hello(
 
 	for ( int y = y_offset; y < y_offset + y_slide; ++y ) {
 		for ( int x = x_offset; x < x_offset + x_slide; ++x ) {
-
 			int i = x + y * kWidth;
-
 			pixels[i] = (uchar4)(get_global_id(0), get_global_id(1), 0, 255).zyxw;
 		}
 	}
-
 }
 
 /* #define CL_BUILD_PROGRAM_FAILURE                    -11 */
