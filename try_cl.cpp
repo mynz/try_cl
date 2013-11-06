@@ -317,7 +317,7 @@ int main(void)
 		};
 
 #if 1
-		const int kNumSpheres = 6; // 13 == NG
+		const int kNumSpheres = 20; // 13 == NG
 		// Sphere sphereArray[kNumSpheres];
 		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
 
@@ -384,8 +384,11 @@ int main(void)
 		err = queue.enqueueNDRangeKernel(
 				kernel, 
 				cl::NullRange,  // must be null in current OpenCL verison.
-				cl::NDRange(1),
-				cl::NullRange,
+
+				cl::NDRange(512), // global
+
+				cl::NDRange(16),	// local
+
 				NULL,
 				&kernelEvent); 
 		assert( err == CL_SUCCESS );

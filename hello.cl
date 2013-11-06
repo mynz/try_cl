@@ -104,11 +104,11 @@ __kernel void hello(
 		/* mat[i] = mat[i] * 2.f; */
 	}
 
-	mat[15] = get_global_id(0);
-
+	mat[11] = get_local_size(0);
 	mat[12] = 777;
 	mat[13] = misc.num_spheres;
 	mat[14] = misc.num_colors;
+	mat[15] = get_global_id(0);
 
 
 #if 0
@@ -127,7 +127,12 @@ __kernel void hello(
 
 	const float3 camera_pos = (float3)(0, 0, 0);
 
-	for ( int sy = 0; sy < kWidth; ++sy ) {
+
+	int slide  = kWidth / get_global_size(0);
+	int offset = slide * get_global_id(0);
+
+	for ( int sy = offset; sy < offset + slide; ++sy ) {
+	/* for ( int sy = 0; sy < kWidth; ++sy ) { */
 		for ( int sx = 0; sx < kWidth; ++sx ) {
 
 			float2 w = to_world(sx, sy);
