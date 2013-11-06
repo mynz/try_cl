@@ -27,11 +27,20 @@ __kernel void hello(
 	/* scalers[30] = get_global_size(0); */
 	/* scalers[31] = job_width; */
 
-	for ( int y = 0; y < kWidth; ++y ) {
-		for ( int x = 0; x < kWidth; ++x ) {
 
+	scalers[0] = get_global_size(0);
+	scalers[1] = get_local_size(0);
+
+	int slide  = kWidth / get_global_size(0);
+	int offset = slide * get_global_id(0);
+
+	for ( int y = offset; y < offset + slide; ++y ) {
+		for ( int x = 0; x < kWidth; ++x ) {
 			int i = x + y * kWidth;
-			pixels[i] = (uchar4)(155, 0, 0, 255).zyxw;
+
+
+			pixels[i] = (uchar4)(get_global_id(0), 0, 0, 255).zyxw;
+			/* pixels[i] = (uchar4)(155, 0, 0, 255).zyxw; */
 		}
 	}
 
