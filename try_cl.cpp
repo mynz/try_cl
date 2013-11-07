@@ -244,7 +244,6 @@ int main(void)
 
 		cl::Kernel kernel(program_, "hello", &err);
 
-		cl::Event event;
 
 		cl_command_queue_properties prop = 0 | CL_QUEUE_PROFILING_ENABLE ;
 		cl::CommandQueue queue(context, devices[0], prop, &err);
@@ -317,7 +316,7 @@ int main(void)
 		};
 
 #if 1
-		const int kNumSpheres = 20; // 13 == NG
+		const int kNumSpheres = 5; // 13 == NG
 		// Sphere sphereArray[kNumSpheres];
 		Sphere *sphereArray = (Sphere*)malloc(kNumSpheres * sizeof(Sphere));
 
@@ -385,7 +384,7 @@ int main(void)
 				kernel, 
 				cl::NullRange,  // must be null in current OpenCL verison.
 
-				cl::NDRange(512), // global
+				cl::NDRange(64), // global
 
 				cl::NDRange(16),	// local
 
@@ -427,11 +426,14 @@ int main(void)
 
 
 #if 1 // XXX: hello_message
-		err = clEnqueueReadBuffer(queue(), memObj, CL_TRUE, 0,
-				sizeof(message), message, 0, NULL, &event());
+		err = queue.enqueueReadBuffer(memObj, CL_TRUE, 0,
+				sizeof(message), message);
+
 		assert( err == CL_SUCCESS );
 
-		event.wait();
+		cout << "foo" << endl;
+
+		cout << "foo" << endl;
 
 		cout << "read err: " << err << endl;
 		cout << "RESULT MESSAGE IS [" << message << "]" << endl;
@@ -445,7 +447,6 @@ int main(void)
 
 		err = clEnqueueReadBuffer(queue(), matObj(), CL_TRUE, 0,
 				sizeof(mat), &mat[0], 0, NULL, NULL);
-		// err = queue.enqueueReadBuffer(matObj, CL_TRUE, 0, sizeof(mat), mat, NULL, &event);
 		assert( err == CL_SUCCESS );
 
 		// Sleep(3000);
