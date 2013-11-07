@@ -25,18 +25,18 @@ typedef struct {
 	int num_colors;
 } Misc;
 
-float3 lerp(float3 a, float3 b, float r)
+inline float3 lerp(float3 a, float3 b, float r)
 {
 	return a * (1.f - r) + b * r;
 }
 
-float2 to_world(int x, int y)
+inline float2 to_world(int x, int y)
 {
 	return (float2) ((float)x / kWidth * 2.f - 1.0f,
 					((float)y / kWidth * 2.f - 1.0f));
 }
 
-float ray_sphere(Sphere sphere, Ray ray)
+inline float ray_sphere(Sphere sphere, Ray ray)
 {
 	float3 v = sphere.center.xyz - ray.orig;
 	float b = dot(v, ray.dir);
@@ -51,13 +51,13 @@ float ray_sphere(Sphere sphere, Ray ray)
 	return (t1 > 0 ? t1 : t2);
 }
 
-uchar4 from_normal_to_uchar4(float3 norm)
+inline uchar4 from_normal_to_uchar4(float3 norm)
 {
 	float3 f3 = (norm * (float3)(0.5) + (float3)(0.5)) * (float3)(255);
 	return (uchar4)(convert_uchar3(f3), 255);
 }
 
-float3 phong(float3 nrm, float3 eye_dir, float3 diffuse_color)
+inline float3 phong(float3 nrm, float3 eye_dir, float3 diffuse_color)
 {
 	const float3 light_dir = normalize((float3)(1, 0.8, 0.55));
 	float3 hlf = normalize(light_dir - eye_dir);
