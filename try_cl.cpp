@@ -257,11 +257,13 @@ int main(void)
 		err = queue.enqueueNDRangeKernel(
 				kernel, 
 				cl::NullRange,		// must be null in current OpenCL verison.
-				cl::NDRange(64),
-				cl::NDRange(1, 0, 0),
+				cl::NDRange(512, 512),
+				cl::NDRange(64, 1),
 				NULL,
 				&kernelEvent); 
-		// cout << "err: " << err << endl;
+
+		cout << "err: " << err << endl;
+
 		assert( err == CL_SUCCESS );
 
 		err = kernelEvent.wait();

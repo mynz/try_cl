@@ -15,8 +15,9 @@ __kernel void hello(
 	/* scalers[ get_global_id(0) ] = get_local_id(0) + 100 * get_global_id(0); */
 	/* scalers[ get_local_id(0) ] = 123; */
 
-	/* scalers[15] = get_num_groups(0); */
-	/* scalers[31] = get_num_groups(0); // 6 */
+	scalers[15] = get_num_groups(0);
+	scalers[16] = get_num_groups(1);
+
 
 	for ( int i = 0; i < 32; ++i ) {
 	  /* scalers[i] = get_global_id(0); */
@@ -31,16 +32,18 @@ __kernel void hello(
 	scalers[0] = get_global_size(0);
 	scalers[1] = get_local_size(0);
 
-	int slide  = kWidth / get_global_size(0);
-	int offset = slide * get_global_id(0);
+	int x_slide  = kWidth / get_global_size(0);
+	int x_offset = x_slide * get_global_id(0);
 
-	for ( int y = offset; y < offset + slide; ++y ) {
-		for ( int x = 0; x < kWidth; ++x ) {
+	int y_slide  = kWidth / get_global_size(1);
+	int y_offset = y_slide * get_global_id(1);
+
+	for ( int y = y_offset; y < y_offset + y_slide; ++y ) {
+		for ( int x = x_offset; x < x_offset + x_slide; ++x ) {
+
 			int i = x + y * kWidth;
 
-
-			pixels[i] = (uchar4)(get_global_id(0), 0, 0, 255).zyxw;
-			/* pixels[i] = (uchar4)(155, 0, 0, 255).zyxw; */
+			pixels[i] = (uchar4)(get_global_id(0), get_global_id(1), 0, 255).zyxw;
 		}
 	}
 
