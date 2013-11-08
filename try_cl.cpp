@@ -387,8 +387,8 @@ int main(void)
 				kernel, 
 				cl::NullRange,  // must be null in current OpenCL verison.
 
-				cl::NDRange(512, 512),
-				cl::NDRange(64, 4),
+				cl::NDRange(256, 512),
+				cl::NDRange(32, 4),
 
 				NULL,
 				&kernelEvent); 
