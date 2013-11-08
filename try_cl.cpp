@@ -233,7 +233,8 @@ int main(void)
 		cl::Program program_ = cl::Program(context, source);
 		err = program_.build(devices);
 
-		if ( err != CL_SUCCESS ) {
+		if ( err != CL_SUCCESS )
+		{
 			std::string str;
 			program_.getBuildInfo(devices[0], CL_PROGRAM_BUILD_LOG, &str);
 			cout << "buid error ocurred[" << err << "]: " << endl << str << endl;
@@ -344,9 +345,10 @@ int main(void)
 		};
 #endif
 
-		cl::Buffer sphereMem(context,
-				CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
-				kNumSpheres * sizeof(Sphere), sphereArray, &err);
+		cl::Buffer sphereMem(context, CL_MEM_READ_ONLY, kNumSpheres * sizeof(Sphere), NULL, &err);
+		assert( err == CL_SUCCESS );
+
+		err = queue.enqueueWriteBuffer(sphereMem, CL_TRUE, 0, kNumSpheres * sizeof(Sphere), sphereArray);
 		assert( err == CL_SUCCESS );
 
 		err = kernel.setArg(4, sphereMem);
@@ -423,7 +425,8 @@ int main(void)
 			// << "duration: " << elpSec
 			// << endl;
 
-		cout << "Done: enqueueNDRangeKernel(): " << elpSec << " Sec" << endl;
+		cout << "Done: enqueueNDRangeKernel(): " << elpSec << " Sec"
+			<< " [" << 1.f / elpSec << " fps]"  << endl;
 
 
 #if 1 // XXX: hello_message
