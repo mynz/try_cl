@@ -124,16 +124,15 @@ __kernel void hello(
 #endif
 
 #if 1 // ray tracing.
-
 	const float3 camera_pos = (float3)(0, 0, 0);
 
+	int x_slide  = kWidth / get_global_size(0);
+	int y_slide  = kWidth / get_global_size(1);
+	int x_offset = x_slide * get_global_id(0);
+	int y_offset = y_slide * get_global_id(1);
 
-	int slide  = kWidth / get_global_size(0);
-	int offset = slide * get_global_id(0);
-
-	for ( int sy = offset; sy < offset + slide; ++sy ) {
-	/* for ( int sy = 0; sy < kWidth; ++sy ) { */
-		for ( int sx = 0; sx < kWidth; ++sx ) {
+	for ( int sy = y_offset; sy < y_offset + y_slide; ++sy ) {
+		for ( int sx = x_offset; sx < x_offset + x_slide; ++sx ) {
 
 			float2 w = to_world(sx, sy);
 
