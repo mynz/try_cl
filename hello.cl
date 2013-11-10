@@ -75,11 +75,11 @@ inline float3 phong(float3 nrm, float3 eye_dir, float3 diffuse_color)
 __kernel void hello(
 		  __global char *str
 		, __global float *mat
-		, __read_only image2d_t image
-		, __global uchar4 *outImage
-		, __constant Sphere *sphere_array
-		, __constant float3* color_table
-		, const Misc misc
+		/* , __read_only image2d_t image */
+		/* , __global uchar4 *outImage */
+		/* , __constant Sphere *sphere_array */
+		/* , __constant float3* color_table */
+		/* , const Misc misc */
 		) 
 {
 	str[0] = 'H';
@@ -96,96 +96,8 @@ __kernel void hello(
 	/* str[15] = ('a' == 'a'); */
 	str[15] = ((float4)(1, 1, 1, 1) == (float4)(1, 1, 1, 1)).x;
 
-	////
 
-	for ( int i = 0; i < 16; ++i ) {
-		/* mat[i] = i * 100.0f; */
-		mat[i] += 3.f;
-		/* mat[i] = mat[i] * 2.f; */
-	}
-
-	mat[11] = get_local_size(0);
-	mat[12] = 777;
-	mat[13] = misc.num_spheres;
-	mat[14] = misc.num_colors;
-	mat[15] = get_global_id(0);
-
-
-#if 0
-	int x, y;
-	for ( y = 0; y < 4; ++y ) {
-		for ( x = 0; x < 4; ++x ) {
-			float2 pos = (float2)(x, y);
-			float4 col = read_imagef(image, s_linear, pos);
-			int i = 4 * y + x;
-			mat[i] = col.x;
-		}
-	}
-#endif
-
-#if 1 // ray tracing.
-	const float3 camera_pos = (float3)(0, 0, 0);
-
-	int x_slide  = kWidth / get_global_size(0);
-	int y_slide  = kWidth / get_global_size(1);
-	int x_offset = x_slide * get_global_id(0);
-	int y_offset = y_slide * get_global_id(1);
-
-	for ( int sy = y_offset; sy < y_offset + y_slide; ++sy ) {
-		for ( int sx = x_offset; sx < x_offset + x_slide; ++sx ) {
-
-			float2 w = to_world(sx, sy);
-
-			float3 screen_center = (float3)(w, -1.f);
-			float3 eye_dir = normalize(screen_center - camera_pos);
-
-			Ray ray;
-			ray.orig = camera_pos;
-			ray.dir  = eye_dir;
-
-			float3 col = gray;
-			float depth = infinity;
-
-			Sphere sp;
-			for ( int s = 0; s < misc.num_spheres; ++s ) {
-				sp = sphere_array[s];
-				float d = ray_sphere(sp, ray);
-
-				if ( d < depth ) { // hit
-					depth = d;
-					float3 hit_pos = camera_pos + d * eye_dir;
-					float3 nrm = normalize(hit_pos - sp.center.xyz);
-#if 1 // phong shading
-					/* col = phong(nrm, eye_dir, red) ; */
-					col = phong(nrm, eye_dir, color_table[s % misc.num_colors]) ;
-#endif
-
-#if 1 // refrection.
-					Ray ray2;
-					ray2.orig = hit_pos;
-					ray2.dir = nrm;
-					for ( int s2 = 0; s2 < misc.num_spheres; ++s2 ) {
-						if ( s2 != s ) {
-							Sphere sp2 = sphere_array[s2];
-							float d2 = ray_sphere(sp2, ray2);
-							if ( d2 != infinity ) {
-#if 1 // phong shading
-								float3 hit_pos2 = ray2.orig + d * ray2.dir;
-								float3 nrm = normalize(hit_pos2 - sp2.center.xyz);
-								col = lerp(col, phong(nrm, eye_dir, color_table[s2 % misc.num_colors]), 0.75f);
-#endif
-							}
-						}
-					}
-#endif
-				}
-			}
-
-			int idx = sy * kWidth + sx;
-			outImage[idx] = (uchar4)(convert_uchar3(col.zyx * (float3)(255)), 255);
-		}
-	}
-#endif
+	return;
 
 }
 /* #define CL_BUILD_PROGRAM_FAILURE                    -11 */

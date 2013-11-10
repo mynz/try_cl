@@ -274,7 +274,7 @@ int main(void)
 		assert( err == CL_SUCCESS );
 #endif
 
-#if 1 // input image.
+#if 0 // input image.
 		float imgSrc[3*3] = {
 			0, 1, 0,
 			1, 0, 0,
@@ -296,7 +296,7 @@ int main(void)
 #endif
 
 
-#if 1 // outImage
+#if 0 // outImage
 		cl::Buffer outImageMem(context, CL_MEM_WRITE_ONLY, outImageByte, NULL, &err); 
 		assert( err == CL_SUCCESS );
 
@@ -309,7 +309,7 @@ int main(void)
 			kernel.getWorkGroupInfo<CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE>(devices[0], &err) << endl;
 #endif
 
-#if 1
+#if 0
 		struct Sphere {
 			float center[4];
 			float color[3]; // 
@@ -354,7 +354,7 @@ int main(void)
 		assert( err == CL_SUCCESS );
 #endif
 
-#if 1
+#if 0
 	struct Vec4 { float x, y, z, w; };
 	Vec4 colorTable[] = {
 		{ 1, 0, 0,   0},
@@ -386,8 +386,8 @@ int main(void)
 				kernel, 
 				cl::NullRange,  // must be null in current OpenCL verison.
 
-				cl::NDRange(256, 512),
-				cl::NDRange(32, 4),
+				cl::NDRange(1),
+				cl::NullRange,
 
 				NULL,
 				&kernelEvent); 
@@ -458,7 +458,7 @@ int main(void)
 		}
 #endif
 
-#if 1
+#if 0
 		uint8_t *outImage = (uint8_t*)malloc(outImageByte);
 		memset(outImage, 0xcc, outImageByte);
 		err = queue.enqueueReadBuffer(outImageMem, CL_TRUE, 0,
