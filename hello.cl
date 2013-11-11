@@ -92,16 +92,11 @@ __kernel void hello(
 	for ( int i = 0; i < n; ++i ) {
 		str[i + 5] = w[i];
 	}
-	/* str[15] = ('a' == 'a'); */
 	str[15] = ((float4)(1, 1, 1, 1) == (float4)(1, 1, 1, 1)).x;
 
 	////
 
-	for ( int i = 0; i < 16; ++i ) {
-		/* mat[i] = i * 100.0f; */
-		mat[i] += 3.f;
-		/* mat[i] = mat[i] * 2.f; */
-	}
+	/* for ( int i = 0; i < 16; ++i ) { mat[i] = 0; } */
 
 	mat[11] = get_local_size(0);
 	mat[12] = 777;

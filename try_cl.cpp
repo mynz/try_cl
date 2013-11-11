@@ -267,8 +267,6 @@ int main(void)
 		cl::Buffer outImageMem(context, CL_MEM_WRITE_ONLY, outImageByte, NULL, &err); 
 		assert( err == CL_SUCCESS );
 
-		// err = queue.enqueueWriteBuffer( outImageMem, CL_TRUE, 0, sizeof(outImageMem), (void*)outImage);
-		
 		err = kernel.setArg(2, outImageMem);
 		assert( err == CL_SUCCESS );
 
@@ -383,13 +381,6 @@ int main(void)
 		const cl_ulong NSEC = 1000000000;
 		double elpSec = (double(ecnt - qcnt) / NSEC);
 
-		// cout << "profile[queued, start, end]: "
-			// << (qcnt / NSEC) << ", "
-			// << (scnt / NSEC) << ", "
-			// << (ecnt / NSEC) << ", "
-			// << "duration: " << elpSec
-			// << endl;
-
 		cout << "Done: enqueueNDRangeKernel(): " << elpSec << " Sec"
 			<< " [" << 1.f / elpSec << " fps]"  << endl;
 
@@ -407,13 +398,7 @@ int main(void)
 
 		printf("message[15]: '%d'\n", message[15]);
 
-		// for ( int i = 0; i < 16; ++i ) {
-			// cout << "src mat[" << i << "]: " << mat[i] << endl;
-		// }
-
-		err = clEnqueueReadBuffer(queue(), matObj(), CL_TRUE, 0,
-				sizeof(mat), &mat[0], 0, NULL, NULL);
-		// err = queue.enqueueReadBuffer(matObj, CL_TRUE, 0, sizeof(mat), mat, NULL, &event);
+		err = queue.enqueueReadBuffer(matObj, CL_TRUE, 0, sizeof(mat), mat, NULL, &event);
 		assert( err == CL_SUCCESS );
 
 		// Sleep(3000);
