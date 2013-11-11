@@ -214,7 +214,6 @@ int main(void)
 		}
 
 		cout << "code byte: " <<  str.size() << endl;
-		// cout << "code byte: " <<  str.size() << endl << str << endl;
 
 		cl::Program::Sources source(1,
 				std::make_pair(str.c_str(), str.size()));
@@ -264,35 +263,13 @@ int main(void)
 		assert( err == CL_SUCCESS );
 #endif
 
-#if 1 // input image.
-		float imgSrc[3*3] = {
-			0, 1, 0,
-			1, 0, 0,
-			0, 1, 0,
-		};
-
-		cl::Image2D imgObj(context, CL_MEM_READ_ONLY,
-				cl::ImageFormat(CL_R, CL_FLOAT),
-				3, 3, 0, NULL, &err);
-
-		cl::size_t<3> origin; origin[0] = origin[1] = origin[2] = 0;
-		cl::size_t<3> region; region[0] = 3; region[1] = 3; region[2] = 1;
-
-		err = queue.enqueueWriteImage(imgObj, CL_TRUE, origin, region, 
-				0, 0, (void*)imgSrc);
-		assert( err == CL_SUCCESS );
-
-		kernel.setArg(2, imgObj);
-#endif
-
-
 #if 1 // outImage
 		cl::Buffer outImageMem(context, CL_MEM_WRITE_ONLY, outImageByte, NULL, &err); 
 		assert( err == CL_SUCCESS );
 
 		// err = queue.enqueueWriteBuffer( outImageMem, CL_TRUE, 0, sizeof(outImageMem), (void*)outImage);
 		
-		err = kernel.setArg(3, outImageMem);
+		err = kernel.setArg(2, outImageMem);
 		assert( err == CL_SUCCESS );
 
 		cout << "CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE: " << 
@@ -340,7 +317,7 @@ int main(void)
 		err = queue.enqueueWriteBuffer(sphereMem, CL_TRUE, 0, kNumSpheres * sizeof(Sphere), sphereArray);
 		assert( err == CL_SUCCESS );
 
-		err = kernel.setArg(4, sphereMem);
+		err = kernel.setArg(3, sphereMem);
 		assert( err == CL_SUCCESS );
 #endif
 
@@ -353,7 +330,7 @@ int main(void)
 	};
 	cl::Buffer colorTableMem(context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
 			sizeof(colorTable), colorTable, &err);
-	err = kernel.setArg(5, colorTableMem);
+	err = kernel.setArg(4, colorTableMem);
 	assert( err == CL_SUCCESS );
 
 
@@ -362,7 +339,7 @@ int main(void)
 		sizeof(colorTable) / sizeof(colorTable[0]),
 	};
 
-	err = kernel.setArg(6, sizeof(misc), misc);
+	err = kernel.setArg(5, sizeof(misc), misc);
 	assert( err == CL_SUCCESS );
 
 #endif
