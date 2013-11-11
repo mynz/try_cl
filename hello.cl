@@ -75,7 +75,6 @@ float3 phong(float3 nrm, float3 eye_dir, float3 diffuse_color)
 __kernel void hello(
 		  __global char *str
 		, __global float *mat
-		, __read_only image2d_t image
 		, __global uchar4 *outImage
 		, __constant Sphere *sphere_array
 		, __constant float3* color_table
@@ -93,35 +92,17 @@ __kernel void hello(
 	for ( int i = 0; i < n; ++i ) {
 		str[i + 5] = w[i];
 	}
-	/* str[15] = ('a' == 'a'); */
 	str[15] = ((float4)(1, 1, 1, 1) == (float4)(1, 1, 1, 1)).x;
 
 	////
 
-	for ( int i = 0; i < 16; ++i ) {
-		/* mat[i] = i * 100.0f; */
-		mat[i] += 3.f;
-		/* mat[i] = mat[i] * 2.f; */
-	}
+	/* for ( int i = 0; i < 16; ++i ) { mat[i] = 0; } */
 
 	mat[11] = get_local_size(0);
 	mat[12] = 777;
 	mat[13] = misc.num_spheres;
 	mat[14] = misc.num_colors;
 	mat[15] = get_global_id(0);
-
-
-#if 0
-	int x, y;
-	for ( y = 0; y < 4; ++y ) {
-		for ( x = 0; x < 4; ++x ) {
-			float2 pos = (float2)(x, y);
-			float4 col = read_imagef(image, s_linear, pos);
-			int i = 4 * y + x;
-			mat[i] = col.x;
-		}
-	}
-#endif
 
 #if 1 // ray tracing.
 	const float3 camera_pos = (float3)(0, 0, 0);
