@@ -24,12 +24,6 @@
 
 using namespace std;
 
-const char * helloStr  = "__kernel void "
-                         "hello(void) "
-                         "{ "
-                         "  "
-                         "} ";
-						
 void printPlatformInfo(const cl::Platform &p)
 {
 	cl_platform_info infos[] = {
@@ -211,10 +205,6 @@ int main(void)
 		}
 #endif
 
-#if 0
-		cl::Program::Sources source(1,
-				std::make_pair(helloStr, strlen(helloStr)));
-#else
 		string str;
 		{
 			std::stringstream ss;
@@ -228,7 +218,6 @@ int main(void)
 
 		cl::Program::Sources source(1,
 				std::make_pair(str.c_str(), str.size()));
-#endif
 
 		cl::Program program_ = cl::Program(context, source);
 		err = program_.build(devices);
